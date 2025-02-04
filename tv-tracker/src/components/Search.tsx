@@ -42,11 +42,11 @@ export default function Search() {
   }
 
   return (
-    <div className='grow flex items-center relative mr-4'>
-      <div className="grow max-w-2xl h-10 border border-zinc-500 rounded-full">
-        <input value={searchQuery} className='py-2 px-4 w-full outline-none border-0' type="text" placeholder="Search for a show..." onChange={debounceSearch} />
-      </div>
-      <ul className='absolute top-10 z-20 left-4 bg-white dark:bg-gray-800 max-w-160 w-full max-h-96 transition-[height] duration-1000 ease-in-out overflow-y-auto'>
+    <div className='relative'>
+      <div className='flex justify-center'>
+      <input value={searchQuery} className="input input-bordered w-24 md:w-auto" type="text" placeholder="Search for a show..." onChange={debounceSearch} />
+     </div>
+      <ul className='absolute top-10 z-20 right-1/8 bg-white dark:bg-gray-800 max-w-160 w-full max-h-96 transition-[height] duration-1000 ease-in-out overflow-y-auto'>
         {showsList}
       </ul>
     </div>

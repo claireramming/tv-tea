@@ -2,6 +2,7 @@ import Header from './components/Header'
 import { BrowserRouter, Route, Routes } from "react-router";
 import './App.css'
 import ShowPage from './components/ShowPage';
+import WatchListPage from './components/WatchListPage';
 
 function App() {
 
@@ -10,7 +11,7 @@ function App() {
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/" element={<div>Home</div>} />
+          <Route path="/" element={<WatchListPage />} />
           <Route path="show">
             <Route path=":id" element={<ShowPage/>} />
           </Route>
