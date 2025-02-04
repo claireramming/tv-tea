@@ -11,7 +11,7 @@ function App() {
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/" element={<WatchListPage />} />
+          <Route path="/" element={<WatchListPage sessionId='' />} />
           <Route path="show">
             <Route path=":id" element={<ShowPage/>} />
           </Route>
