@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+import dj_database_url
 from dotenv import load_dotenv, find_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -35,20 +36,25 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ('backend/static',)
 
+CORS_ALLOWED_ORIGINS = ['http://localhost:3090']
+
 # Application definition
 
 INSTALLED_APPS = [
+    'backend',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -80,12 +86,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# Database
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+default_db = dj_database_url.config(
+    env="DATABASE_URL",
+    default="postgres://localhost:5432/tvtracker",
+    conn_max_age=60,
+)
+DATABASES = {"default": default_db}
 
 
 # Password validation
@@ -133,3 +141,4 @@ if ENV_FILE:
 AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
 AUTH0_CLIENT_ID = os.environ.get("AUTH0_CLIENT_ID")
 AUTH0_CLIENT_SECRET = os.environ.get("AUTH0_CLIENT_SECRET")
+AUTH0_AUDIENCE = os.environ.get("AUTH0_AUDIENCE", "https://" + AUTH0_DOMAIN + "/api/v2/")

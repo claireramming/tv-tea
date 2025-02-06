@@ -1,45 +1,37 @@
 import json
 from authlib.integrations.django_client import OAuth
 from django.conf import settings
-from django.shortcuts import redirect, render, redirect
-from django.urls import reverse
-from urllib.parse import quote_plus, urlencode
+from django.shortcuts import render
+from rest_framework import viewsets
+from authlib.integrations.django_oauth2 import ResourceProtector
+from django.http import JsonResponse
+from backend import validator
 
-oauth = OAuth()
+from backend.models import UserProfile, UserWatchList, UserWatchStats
+from backend.serializers import UserProfileSerializer, UserWatchListSerializer, UserWatchStatsSerializer
 
-oauth.register(
-    "auth0",
-    client_id=settings.AUTH0_CLIENT_ID,
-    client_secret=settings.AUTH0_CLIENT_SECRET,
-    client_kwargs={
-        "scope": "openid profile email",
-    },
-    server_metadata_url=f"https://{settings.AUTH0_DOMAIN}/.well-known/openid-configuration",
+require_auth = ResourceProtector()
+validator = validator.Auth0JWTBearerTokenValidator(
+    domain=settings.AUTH0_DOMAIN,
+    audience=settings.AUTH0_AUDIENCE,
 )
+require_auth.register_token_validator(validator)
 
-def login(request):
-    return oauth.auth0.authorize_redirect(
-        request, request.build_absolute_uri(reverse("callback"))
-    )
 
-def callback(request):
-    token = oauth.auth0.authorize_access_token(request)
-    request.session["user"] = token
-    return redirect(request.build_absolute_uri(reverse("index")))
+def public(request):
+    """No access token required to access this route
+    """
+    response = "Hello from a public endpoint! You don't need to be authenticated to see this."
+    return JsonResponse(dict(message=response))
 
-def logout(request):
-    request.session.clear()
 
-    return redirect(
-        f"https://{settings.AUTH0_DOMAIN}/v2/logout?"
-        + urlencode(
-            {
-                "returnTo": request.build_absolute_uri(reverse("index")),
-                "client_id": settings.AUTH0_CLIENT_ID,
-            },
-            quote_via=quote_plus,
-        ),
-    )
+@require_auth(None)
+def private(request):
+    """A valid access token is required to access this route
+    """
+    response = "Hello from a private endpoint! You need to be authenticated to see this."
+    return JsonResponse(dict(message=response))
+
 
 def index(request):
     return render(
@@ -50,3 +42,30 @@ def index(request):
             "pretty": json.dumps(request.session.get("user"), indent=4),
         },
     )
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    lookup_field = "user__id"
+    
+    def get_queryset(self):
+        user_id = self.request.user.id
+        return UserProfile.objects.filter(user__id=user_id)
+    
+class UserWatchListViewSet(viewsets.ModelViewSet):
+    queryset = UserWatchList.objects.all()
+    serializer_class = UserWatchListSerializer
+    lookup_field = "user__id"
+    
+    def get_queryset(self):
+        user_id = self.request.user.id
+        return UserWatchList.objects.filter(user__id=user_id)
+    
+
+class UserWatchStatsViewSet(viewsets.ModelViewSet):
+    serializer_class = UserWatchStatsSerializer
+    lookup_field = "user__id"
+    
+    def get_queryset(self):
+        user_id = self.request.user.id
+        return UserWatchStats.objects.filter(user__id=user_id)
