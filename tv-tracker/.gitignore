@@ -1,3 +1,9 @@
+# Python ignores
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Logs
 logs
 *.log
@@ -22,3 +28,27 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# mypy
+.mypy_cache/
+
+
+# Django ignores
+*.egg-info
+*.pot
+*.py[co]
+.tox/
+__pycache__
+MANIFEST
+dist/
+docs/_build/
+docs/locale/
+node_modules/
+tests/coverage_html/
+tests/.coverage
+build/
+tests/report/
+db.sqlite3
+staticfiles/
+debug.env
+.vscode/settings.json
