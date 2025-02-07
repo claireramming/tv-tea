@@ -3,11 +3,10 @@ from django.conf import settings
 from django.shortcuts import render
 from rest_framework import viewsets
 from django.http import JsonResponse
-from backend.authorization import AuthorizationHeaderMixin, authorized
 from backend.models import UserProfile, UserWatchList, UserWatchStats
 from backend.serializers import UserProfileSerializer, UserWatchListSerializer, UserWatchStatsSerializer
 
-@authorized
+
 def private(request):
     """A valid access token is required to access this route
     """
@@ -23,11 +22,11 @@ def index(request):
         },
     )
 
-class UserProfileViewSet(AuthorizationHeaderMixin, viewsets.ModelViewSet):
+class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
     
-class UserWatchListViewSet(viewsets.ModelViewSet, AuthorizationHeaderMixin):
+class UserWatchListViewSet(viewsets.ModelViewSet):
     queryset = UserWatchList.objects.all()
     serializer_class = UserWatchListSerializer
     lookup_field = "user_id"
@@ -36,8 +35,14 @@ class UserWatchListViewSet(viewsets.ModelViewSet, AuthorizationHeaderMixin):
         user_id = self.request.user.sub
         return UserWatchList.objects.filter(user_id=user_id)
     
+    def create(self, request, *args, **kwargs):
+        user_id = request.user.username.split(".")[1]
+        request.data["user"] = user_id
+        print(request.data)
+        return super().create(request, *args, **kwargs)
+    
 
-class UserWatchStatsViewSet(viewsets.ModelViewSet, AuthorizationHeaderMixin):
+class UserWatchStatsViewSet(viewsets.ModelViewSet):
     serializer_class = UserWatchStatsSerializer
     lookup_field = "user_id"
     

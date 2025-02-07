@@ -349,6 +349,29 @@ files = [
 django = ">=4.2"
 
 [[package]]
+name = "drf-jwt"
+version = "1.19.2"
+description = "JSON Web Token based authentication for Django REST framework"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+groups = ["main"]
+files = [
+    {file = "drf-jwt-1.19.2.tar.gz", hash = "sha256:660bc66f992065cef59832adcbbdf871847e9738671c19e5121971e773768235"},
+    {file = "drf_jwt-1.19.2-py2.py3-none-any.whl", hash = "sha256:63c3d4ed61a1013958cd63416e2d5c84467d8ae3e6e1be44b1fb58743dbd1582"},
+]
+
+[package.dependencies]
+Django = ">=1.11"
+djangorestframework = ">=3.7"
+PyJWT = {version = ">=1.5.2,<3.0.0", extras = ["crypto"]}
+
+[package.extras]
+dev = ["tox"]
+docs = ["mkdocs (==0.13.2)"]
+lint = ["black", "flake8", "isort"]
+test = ["mock", "pytest (>=3.0)", "pytest-cov", "pytest-django", "pytest-runner", "six"]
+
+[[package]]
 name = "idna"
 version = "3.10"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -465,6 +488,9 @@ files = [
     {file = "pyjwt-2.10.1.tar.gz", hash = "sha256:3cc5772eb20009233caf06e9d8a0577824723b44e6648ee0a2aedb6cf9381953"},
 ]
 
+[package.dependencies]
+cryptography = {version = ">=3.4.0", optional = true, markers = "extra == \"crypto\""}
+
 [package.extras]
 crypto = ["cryptography (>=3.4.0)"]
 dev = ["coverage[toml] (==5.0.4)", "cryptography (>=3.4.0)", "pre-commit", "pytest (>=6.0.0,<7.0.0)", "sphinx", "sphinx-rtd-theme", "zope.interface"]
@@ -570,4 +596,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10.15"
-content-hash = "03bbc06d95f9e5e8d29c8fc5546e37f49b94eebe8f393f6a0e9aedf72a7033d2"
+content-hash = "70caeaeb750a7ab9563a5ac784e43895774ce798f0aa0588a5c89cc004af745e"

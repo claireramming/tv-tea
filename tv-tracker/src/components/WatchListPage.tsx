@@ -6,7 +6,7 @@ export default function WatchListPage(props: { isLoading: Boolean, login: () => 
   const user: User = useContext(UserContext);
 
   async function makeGETRequest() {
-    const url = 'api/private';
+    const url = 'profile/';
     
     console.log(await SimpleFetch.get(url, {}, user?.accessToken));
   }

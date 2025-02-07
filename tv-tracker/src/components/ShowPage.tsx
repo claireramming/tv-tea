@@ -1,12 +1,15 @@
 import { useParams } from "react-router";
 import { Genre, MovieDb, SimpleSeason } from "moviedb-promise";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import { UserContext, User } from "./UserContext";
 import { imageBaseUrl } from "../constants";
 import Season from "./Season";
+import { addSeasonToWatchList } from "../utils";
 
 
 export default function ShowPage() {
   const moviedb = new MovieDb('2a45495eb00bed3267d8daa48231f4d5')
+  const user: User = useContext(UserContext);
 
   function fetchShowData(id: string|number) {
     return moviedb.tvInfo({ id, append_to_response: 'watch/providers,content_ratings' });
@@ -50,6 +53,18 @@ export default function ShowPage() {
     return (<Season key={season.id} data={{...season, ...seasonData?.[i] || {}}} />);
   });
 
+  const seasonWatchList = show.seasons.map((season: SimpleSeason) => {
+    return (
+      <li key={season.id}>
+        <a onClick={() => addSeasonToWatchList(show.id, season.season_number, show.status, user.accessToken)}>
+          Season {season.season_number}
+        </a>
+      </li>
+    )
+  });
+
+  
+
   return (
     <>
       <img src={imageBaseUrl + 'original' + show.backdrop_path} className="absolute opacity-25 z-0 h-128 w-full min-w-3xl object-cover" alt={show.name} />  
@@ -60,6 +75,12 @@ export default function ShowPage() {
           <h3>{contentRating} • {show.first_air_date.substring(0,4)} - {show.in_production ? '' : show.last_air_date.substring(0,4)} • {genresString}</h3>
           <h2 className='font-semibold mt-8'>Overview</h2>
           <p className='h-30 overflow-y-auto'>{show.overview}</p>
+          <details className="dropdown">
+            <summary className="btn m-1">Add to WatchList</summary>
+            <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+              {seasonWatchList}
+            </ul>
+          </details>
           <h2 className='font-semibold mt-8'>Watch on:</h2>
           <div className='flex gap-4 mt-2'>{providersList}</div>
         </div>

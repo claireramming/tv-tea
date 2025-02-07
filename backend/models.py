@@ -3,12 +3,12 @@ from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 
 STATUS_OPTIONS = (    
-    ("returning_series", "Returning Series"),
-    ("planned", "Planned"),
-    ("in_production", "In Production"),
-    ("ended", "Ended"),
-    ("canceled", "Canceled"),
-    ("pilot", "Pilote")
+    ("Returning Series", "Returning Series"),
+    ("Planned", "Planned"),
+    ("In Production", "In Production"),
+    ("Ended", "Ended"),
+    ("Canceled", "Canceled"),
+    ("Pilot", "Pilot")
 )
 
 class UserProfile(models.Model):
@@ -21,11 +21,11 @@ class UserWatchList(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     show_id = models.IntegerField()
     season = models.IntegerField()
-    num_episodes_watched = models.IntegerField(default=0)
+    num_episodes_watched = models.IntegerField(blank=True, default=0)
     datetime_added_at = models.DateTimeField(auto_now_add=True)
     datetime_started_at = models.DateTimeField(null=True, blank=True)
     datetime_finished_at = models.DateTimeField(null=True, blank=True)
-    num_delay_days = models.IntegerField(default=0)
+    num_delay_days = models.IntegerField(blank=True, default=0)
     status= models.CharField(choices=STATUS_OPTIONS)
 
 class UserWatchStats(models.Model):
