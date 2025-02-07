@@ -1,37 +1,17 @@
 import json
-from authlib.integrations.django_client import OAuth
 from django.conf import settings
 from django.shortcuts import render
 from rest_framework import viewsets
-from authlib.integrations.django_oauth2 import ResourceProtector
 from django.http import JsonResponse
-from backend import validator
-
+from backend.authorization import AuthorizationHeaderMixin, authorized
 from backend.models import UserProfile, UserWatchList, UserWatchStats
 from backend.serializers import UserProfileSerializer, UserWatchListSerializer, UserWatchStatsSerializer
 
-require_auth = ResourceProtector()
-validator = validator.Auth0JWTBearerTokenValidator(
-    domain=settings.AUTH0_DOMAIN,
-    audience=settings.AUTH0_AUDIENCE,
-)
-require_auth.register_token_validator(validator)
-
-
-def public(request):
-    """No access token required to access this route
-    """
-    response = "Hello from a public endpoint! You don't need to be authenticated to see this."
-    return JsonResponse(dict(message=response))
-
-
-@require_auth(None)
+@authorized
 def private(request):
     """A valid access token is required to access this route
     """
-    response = "Hello from a private endpoint! You need to be authenticated to see this."
-    return JsonResponse(dict(message=response))
-
+    return JsonResponse(dict(user=request.user.sub))
 
 def index(request):
     return render(
@@ -43,29 +23,24 @@ def index(request):
         },
     )
 
-class UserProfileViewSet(viewsets.ModelViewSet):
+class UserProfileViewSet(AuthorizationHeaderMixin, viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-    lookup_field = "user__id"
     
-    def get_queryset(self):
-        user_id = self.request.user.id
-        return UserProfile.objects.filter(user__id=user_id)
-    
-class UserWatchListViewSet(viewsets.ModelViewSet):
+class UserWatchListViewSet(viewsets.ModelViewSet, AuthorizationHeaderMixin):
     queryset = UserWatchList.objects.all()
     serializer_class = UserWatchListSerializer
-    lookup_field = "user__id"
+    lookup_field = "user_id"
     
     def get_queryset(self):
-        user_id = self.request.user.id
-        return UserWatchList.objects.filter(user__id=user_id)
+        user_id = self.request.user.sub
+        return UserWatchList.objects.filter(user_id=user_id)
     
 
-class UserWatchStatsViewSet(viewsets.ModelViewSet):
+class UserWatchStatsViewSet(viewsets.ModelViewSet, AuthorizationHeaderMixin):
     serializer_class = UserWatchStatsSerializer
-    lookup_field = "user__id"
+    lookup_field = "user_id"
     
     def get_queryset(self):
-        user_id = self.request.user.id
-        return UserWatchStats.objects.filter(user__id=user_id)
+        user_id = self.request.user.sub
+        return UserWatchStats.objects.filter(user_id=user_id)

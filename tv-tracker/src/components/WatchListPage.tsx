@@ -8,7 +8,7 @@ export default function WatchListPage(props: { isLoading: Boolean, login: () => 
   async function makeGETRequest() {
     const url = 'api/private';
     
-    console.log(await SimpleFetch.get(url));
+    console.log(await SimpleFetch.get(url, {}, user?.accessToken));
   }
 
   if (props.isLoading) {

@@ -3,12 +3,10 @@ import '../App.css'
 import Search from './Search'
 import { useContext } from 'react'
 import { UserContext, User } from './UserContext'
-import { useAuth0 } from '@auth0/auth0-react'
 
-export default function Header() {
-  const { logout } = useAuth0();
+export default function Header(props: { logout: () => void }) {
   const user: User|null = useContext(UserContext);
-  const logoutClick = () => logout({ logoutParams: { returnTo: window.location.origin } })
+  
   return (
     <div className="navbar justify-between bg-base-100">
       <div className="">
@@ -34,7 +32,7 @@ export default function Header() {
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
             <li><a>Profile</a></li>
             <li><a>Settings</a></li>
-            <li><a onClick={logoutClick}>Log {user?.isAuthenticated ? 'out' : 'in'}</a></li>
+            <li><a onClick={props.logout}>Log {user?.isAuthenticated ? 'out' : 'in'}</a></li>
           </ul>
         </div>
       </div>
