@@ -1,36 +1,27 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { useParams } from 'react-router';
-import { Genre, MovieDb, ShowResponse, SimpleSeason } from 'moviedb-promise';
+import { Genre, ShowResponse, TvSeasonResponse } from 'moviedb-promise';
 import { useEffect, useState, useContext } from 'react';
 import { UserContext, User } from '../../contexts/UserContext';
 import { imageBaseUrl } from '../../constants';
 import Season from './Season';
 import { addSeasonToWatchList } from '../../utils';
-import { FullSeason, Rating } from '../../types';
+import { FullSeason, Rating, WatchProvider } from '../../types';
 import ProviderImage from '../common/ProviderImage';
+import { fetchSeasonData, fetchShowData } from '../../utils';
 
 export default function ShowPage() {
-  const moviedb = new MovieDb(process.env.TMDB_API_KEY || '');
+  
   const user: User = useContext(UserContext);
 
-  function fetchShowData(id: string | number) {
-    return moviedb.tvInfo({ id, append_to_response: 'watch/providers,content_ratings' });
-  }
-
-  function fetchSeasonData(
-    series_id: string | number | undefined,
-    seasons: SimpleSeason[] | undefined
-  ) {
-    if (!series_id || !seasons) return [];
-    return seasons.map((season) => {
-      console.log(season)
-      return moviedb.seasonInfo({ id: series_id, season_number: season.season_number || 1 });
-    });
-  }
-
-  let params = useParams();
-  const [show, setShow] = useState<ShowResponse>({});
-  const [seasonData, setSeasonData] = useState<FullSeason[]>([]);
+  const params = useParams();
+  const [show, setShow] = useState<ShowResponse & {
+    'watch/providers'?: {
+      results: {US: {flatrate: WatchProvider[]}}
+    },
+    content_ratings?: {results: Rating[]} 
+  } >({});
+  const [seasonData, setSeasonData] = useState<TvSeasonResponse[]>([]);
 
   useEffect(() => {
     if (!params.id) return setShow({});
@@ -38,7 +29,7 @@ export default function ShowPage() {
     showPromise.then((showData) => {
       const seasonPromises = fetchSeasonData(params.id, showData.seasons);
       setShow(showData);
-      Promise.all(seasonPromises).then(setSeasonData);
+      Promise.all(seasonPromises).then(data => setSeasonData(data));
     });
   }, [params.id]);
 
@@ -46,29 +37,34 @@ export default function ShowPage() {
     return <div>Loading...</div>;
   }
 
-  const contentRating =
-    show.content_ratings.results.find((rating: Rating) => rating.iso_3166_1 === 'US')?.rating || 'NR';
-  const genresString: string = show.genres.map((genre: Genre) => genre.name).join(', ');
+  function getContentRating(ratingResults: {results: Rating[]}) {
+    return ratingResults.results.find((rating: Rating) => rating.iso_3166_1 === 'US')?.rating || 'NR';
+  }
 
-  const providers = show['watch/providers'].results?.US?.flatrate
 
-  const seasonsList = show.seasons.map((season: FullSeason, i: number) => {
+  const contentRating = show.content_ratings ? getContentRating(show.content_ratings) : 'NR';
+  const genresString: string = show.genres ? show.genres.map((genre: Genre) => genre.name).join(', ') : '';
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const providers = show?.['watch/providers']?.results?.US ? show['watch/providers'].results?.US?.flatrate : []
+
+  const seasonsList = show.seasons ? show.seasons.map((season: FullSeason, i: number) => {
     return <Season key={season.id} data={{ ...season, ...(seasonData?.[i] || {}) }} />;
-  });
+  }) : <></>;
 
-  const seasonWatchList = show.seasons.map((season: FullSeason) => {
+  const seasonWatchList = show?.seasons ? show.seasons.map((season: FullSeason) => {
     return (
       <li key={season.id}>
         <a
           onClick={() =>
-            addSeasonToWatchList(show.id, season.season_number, show.status, user.accessToken)
+            void addSeasonToWatchList(show.id, season.season_number, show.status, user.accessToken)
           }
         >
           Season {season.season_number}
         </a>
       </li>
     );
-  });
+  }) : <></>;
 
   return (
     <>
@@ -86,8 +82,8 @@ export default function ShowPage() {
           />
           <h1 className="mt-8">{show.name}</h1>
           <h3>
-            {contentRating} • {show.first_air_date.substring(0, 4)} -{' '}
-            {show.in_production ? '' : show.last_air_date.substring(0, 4)} • {genresString}
+            {contentRating} • {show?.first_air_date ? show.first_air_date.substring(0, 4) : ''} -{' '}
+            {show.in_production ? '' : show?.last_air_date ? show.last_air_date.substring(0, 4) : ''} • {genresString}
           </h3>
           <h2 className="font-semibold mt-8">Overview</h2>
           <p className="h-30 overflow-y-auto">{show.overview}</p>

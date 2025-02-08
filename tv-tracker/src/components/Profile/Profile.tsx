@@ -9,7 +9,7 @@ export default function Profile() {
 
   useEffect(() => {
   if (user?.isAuthenticated) {
-    getUserProfile(user?.sub || '', user?.accessToken || '').then(data => setProfile(data))
+    void getUserProfile(user?.sub || '', user?.accessToken || '').then(data => setProfile(data))
   }
 }, [user]);
 

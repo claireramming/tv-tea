@@ -16,8 +16,7 @@ function App() {
     useAuth0();
 
   const [userMetadata, setUserMetadata] = useState({} as User);
-
-  let metaDataLoading = false;
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
 
   const logoutOfApp = async () => {
     await logout({ logoutParams: { returnTo: window.location.origin } });
@@ -35,37 +34,38 @@ function App() {
     }
   }
 
-  const getUserMetadata = async () => {
-    if (!user?.sub) return;
-    metaDataLoading = true
-    const domain = 'dev-mxo5ack7pqfh6xcm.us.auth0.com';
-
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience: `https://${domain}/api/v2/`,
-          scope: 'read:current_user'
-        }
-      });
-
-      const userDetailsByIdUrl = `https://${domain}/api/v2/users/${user?.sub}`;
-
-      const metadataResponse = await fetch(userDetailsByIdUrl, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
-
-      const user_metadata = await metadataResponse.json();
-      setUserMetadata({ ...user, isAuthenticated, ...user_metadata, accessToken });
-      metaDataLoading = false
-      getOrCreateUserProfile(user.sub, accessToken);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   useEffect(() => {
+    const getUserMetadata = async () => {
+      if (!user?.sub) return;
+      setIsLoadingUser(true);
+      const domain = process.env.AUTH0_DOMAIN;
+  
+      try {
+        const accessToken = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: `https://${domain}/api/v2/`,
+            scope: 'read:current_user'
+          }
+        });
+  
+        const userDetailsByIdUrl = `https://${domain}/api/v2/users/${user?.sub}`;
+  
+        const metadataResponse = await fetch(userDetailsByIdUrl, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+  
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const user_metadata: User = await metadataResponse.json();
+        setUserMetadata({ ...user, isAuthenticated, ...user_metadata, accessToken });
+        setIsLoadingUser(false);
+        getOrCreateUserProfile(user.sub, accessToken);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
     if (!user?.sub) return;
     getUserMetadata().then(() =>
       getOrCreateUserProfile(userMetadata.sub || '', userMetadata.accessToken || '')
@@ -80,7 +80,7 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={<WatchListPage isLoading={isLoading || metaDataLoading} login={() => loginWithRedirect()} />}
+              element={<WatchListPage isLoading={isLoading || isLoadingUser} login={() => loginWithRedirect()} />}
             />
             <Route path="show">
               <Route path=":id" element={<ShowPage />} />

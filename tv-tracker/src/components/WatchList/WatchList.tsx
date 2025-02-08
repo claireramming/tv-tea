@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { FullSeason, } from "../../types";
+import { SeasonToWatch } from "../../types";
 import SeasonTile from "./SeasonTile";
 
-export default function WatchList(props: { watchlist: FullSeason[]}) {  
+export default function WatchList(props: { watchlist: SeasonToWatch[]}) {  
   const [tabIndex, setTabIndex] = useState<number>(1);
 
-  let tabContent: FullSeason[] = [];
+  let tabContent: SeasonToWatch[] = [];
   if (tabIndex === 0) {
     tabContent = props.watchlist.filter((season) => !season.datetime_started_at);
   } else if (tabIndex === 1) {
@@ -21,7 +21,7 @@ export default function WatchList(props: { watchlist: FullSeason[]}) {
       <a role="tab" className={`tab ${tabIndex === 1 ? 'tab-active' : ''}`} onClick={() => setTabIndex(1)}>In Progress</a>
       <a role="tab" className={`tab ${tabIndex === 2 ? 'tab-active' : ''}`} onClick={() => setTabIndex(2)}>Completed</a>
     </div>
-      {tabContent.map((season: FullSeason) => { return (<div key={season.id}><SeasonTile season={season} /></div>) })}
+      {tabContent.map((season: SeasonToWatch) => { return (<div key={season.id}><SeasonTile season={season} /></div>) })}
     </>
   )
 }

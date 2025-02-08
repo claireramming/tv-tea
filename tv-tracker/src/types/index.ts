@@ -2,23 +2,17 @@ import { SimpleEpisode } from "moviedb-promise";
 
 export type FullSeason = {
   air_date?: string;
-  episode_count: number;
+  episode_count?: number;
   id: number;
   name: string;
   overview: string;
   poster_path?: string;
   season_number: number;
   episodes: SimpleEpisode[];
-  user?: string,
-  show_id?: number,
-  season?: number,
-  num_episodes_watched?: number,
-  datetime_added_at?: string,
-  datetime_started_at?: string,
-  datetime_finished_at?: string,
-  num_delay_days?: number,
-  status?: string
+  'watch/providers'?: { results: {US: { flatrate: WatchProvider[] } }};
 }
+
+export type SeasonToWatch = FullSeason & WatchListEntry
 
 export type WatchProvider = {
   display_priority: number;

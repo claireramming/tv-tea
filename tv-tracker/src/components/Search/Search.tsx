@@ -19,7 +19,7 @@ export default function Search() {
   function debounceSearch(event: React.ChangeEvent<HTMLInputElement>) {
     setSearchQuery(event.target.value);
     clearTimeout(timer);
-    setTimer(setTimeout(() => searchShows(event.target.value), 300));
+    setTimer(setTimeout(() => void searchShows(event.target.value), 300));
   }
 
   /**
@@ -36,8 +36,8 @@ export default function Search() {
    */
   async function searchShows(searchText: string) {
     if (searchText.trim()) {
-      let resp: TvResultsResponse = await moviedb.searchTv({ query: searchText });
-      setShows((_) => resp.results || []);
+      const resp: TvResultsResponse = await moviedb.searchTv({ query: searchText });
+      setShows(resp.results || []);
     } else {
       setShows([]);
     }

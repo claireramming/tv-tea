@@ -1,19 +1,21 @@
-import { ProfileInfo } from "./types";
+import { ProfileInfo, WatchListEntry } from "./types";
+import { MovieDb, SimpleSeason, TvSeasonResponse } from "moviedb-promise";
 
-/**
- * Fetches the user profile
- * @param {string} token access token
- * @returns user profile if one exists
- */
-export async function getUserProfile(user: string, token: string): Promise<ProfileInfo | null> {
-  try {
-    return await SimpleFetch.get(`profile/${getUserId(user)}/`, {}, token);
-  } catch (e: Error | any) {
-    if (e.status == 404) {
-      return null;
-    }
-  }
-  return null;
+const moviedb = new MovieDb(process.env.TMDB_API_KEY || '');
+
+export function fetchShowData(id: string | number) {
+  return moviedb.tvInfo({ id, append_to_response: 'watch/providers,content_ratings' });
+}
+
+export function fetchSeasonData(
+  series_id: string | number | undefined,
+  seasons: SimpleSeason[] | undefined
+): Promise<TvSeasonResponse>[] {
+  if (!series_id || !seasons) return [];
+  return seasons.map((season) => {
+    console.log(season)
+    return moviedb.seasonInfo({ id: series_id, season_number: season.season_number || 1 });
+  });
 }
 
 /**
@@ -21,15 +23,27 @@ export async function getUserProfile(user: string, token: string): Promise<Profi
  * @param {string} token access token
  * @returns user profile if one exists
  */
-export async function getUserWatchList(token: string): Promise<any | null> {
+export async function getUserProfile(user: string, token: string): Promise<ProfileInfo> {
+  try {
+    return await SimpleFetch.get(`profile/${getUserId(user)}/`, {}, token);
+  } catch (e) {
+    console.error(e);
+    return null
+  }
+}
+
+/**
+ * Fetches the user profile
+ * @param {string} token access token
+ * @returns user profile if one exists
+ */
+export async function getUserWatchList(token: string): Promise<WatchListEntry[] | []> {
   try {
     return await SimpleFetch.get('watchlist/', {}, token);
-  } catch (e: Error | any) {
-    if (e.status == 404) {
-      return null;
-    }
+  } catch (e) {
+    console.error(e)
   }
-  return null;
+  return [];
 }
 
 /**
@@ -41,7 +55,7 @@ export async function createUserProfile(user: string, token: string) {
   if (!user) return;
   try {
     await SimpleFetch.post('profile/', { id: getUserId(user) }, token);
-  } catch (e: Error | any) {
+  } catch (e) {
     console.error(e);
   }
 }
@@ -51,16 +65,15 @@ export async function addSeasonToWatchList(
   seasonNumber: number,
   showStatus: string,
   token: string
-) {
+): Promise<void> {
   try {
     await SimpleFetch.post(
       'watchlist/',
       { show_id: showId, season: seasonNumber, status: showStatus },
       token
     );
-  } catch (e: Error | any) {
+  } catch (e) {
     console.error(e);
-    return e.message;
   }
 }
 
@@ -75,29 +88,11 @@ function getUserId(user: string) {
  * @returns a query string
  */
 function toQueryParams(params = {}) {
-  if (!params) {
+  if (!params || !Object.keys(params).length) {
     return '';
   }
 
-  // supports edge cases where params is an array
-  const queryParams = Array.isArray(params)
-    ? params.filter(([, value]) => value !== undefined && value !== null)
-    : Object.entries(params).filter(([, value]) => value !== undefined && value !== null);
-
-  const formattedQueryParams = queryParams.map(([key, value]) => {
-    // JSON Stringify Object query params
-    if (typeof value === 'object' && !Array.isArray(value)) {
-      return [key, JSON.stringify(value)];
-    }
-
-    return [key, value];
-  });
-
-  if (!formattedQueryParams.length) {
-    return '';
-  }
-
-  return `?${new URLSearchParams(formattedQueryParams)}`;
+  return `?${new URLSearchParams(params)}`;
 }
 
 /**
@@ -118,7 +113,7 @@ export class SimpleFetch {
    */
   static post = async (
     endPoint: string,
-    body: any,
+    body: BodyInit,
     token: string | undefined = undefined,
     additionalHeaders = {},
     otherOptions = {},
@@ -230,7 +225,7 @@ export class SimpleFetch {
    */
   static postFormData = async (
     endPoint: string,
-    formData: any,
+    formData: FormData,
     token: string | undefined = undefined
   ) => {
     return await this.baseFetch(
@@ -266,7 +261,7 @@ export class SimpleFetch {
     contentType = 'application/json',
     responseNotJson = false,
     formDataRequest = false
-  ) => {
+  ): Promise<unknown> => {
     const url = `http://localhost:3000/${endPoint}`;
     //await refreshTokensIfNeeded();
     const options = {

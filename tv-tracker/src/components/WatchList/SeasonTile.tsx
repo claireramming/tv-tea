@@ -1,10 +1,10 @@
-import { FullSeason } from "../../types";
+import { SeasonToWatch } from "../../types";
 import ProviderImage from "../common/ProviderImage";
 
 
-export default function SeasonTile(props: { season: FullSeason }) {
+export default function SeasonTile(props: { season: SeasonToWatch }) {
 
-  const providers = props.season['watch/providers'].results?.US?.flatrate
+  const providers = (props.season?.["watch/providers"]) ? props.season['watch/providers'].results?.US?.flatrate : [];
 
   return (
     <div className="card card-side w-full h-96 bg-base-100 shadow-xl mb-4">
