@@ -7,5 +7,5 @@ export type User = {
   picture?: string;
   isAuthenticated?: boolean;
   accessToken?: string;
-}
+};
 export const UserContext = createContext({});

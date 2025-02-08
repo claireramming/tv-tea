@@ -17,6 +17,9 @@ class UserProfile(models.Model):
     preferred_providers = ArrayField(models.IntegerField(), blank=True, default=list)
 
 class UserWatchList(models.Model):
+    class Meta:
+        unique_together = ("user", "show_id", "season")
+
     id: int = models.AutoField(primary_key=True)
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     show_id = models.IntegerField()
@@ -29,6 +32,9 @@ class UserWatchList(models.Model):
     status= models.CharField(choices=STATUS_OPTIONS)
 
 class UserWatchStats(models.Model):
+    class Meta:
+        unique_together = ("user", "date")
+        
     id: int = models.AutoField(primary_key=True)
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     date = models.DateField()

@@ -32,7 +32,7 @@ class UserWatchListViewSet(viewsets.ModelViewSet):
     lookup_field = "user_id"
     
     def get_queryset(self):
-        user_id = self.request.user.sub
+        user_id = self.request.user.username.split(".")[1]
         return UserWatchList.objects.filter(user_id=user_id)
     
     def create(self, request, *args, **kwargs):

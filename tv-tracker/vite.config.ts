@@ -1,7 +1,7 @@
 import path from 'path';
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
 
 // process.env.VITE_PROXY can be used to overide the default proxyEndpoint
@@ -11,7 +11,12 @@ const proxyEndpoint = process.env.VITE_PROXY || 'http://localhost:3000/';
 // https://vite.dev/config/
 export default defineConfig({
   define: {
-    'process.env': process.env,
+    'process.env': process.env
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    }
   },
   build: {
     target: ['esnext'],
@@ -20,28 +25,28 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/main.tsx'),
       formats: ['es'],
-      name: 'tv-tracker',
+      name: 'tv-tracker'
     },
     rollupOptions: {
       output: {
-        entryFileNames: 'tv-tracker.es.js',
-      },
+        entryFileNames: 'tv-tracker.es.js'
+      }
     },
-    sourcemap: true,
+    sourcemap: true
   },
   plugins: [
     react(),
     tailwindcss(),
     EnvironmentPlugin({
-      TMDB_API_KEY: '',
-    }),
+      TMDB_API_KEY: ''
+    })
   ],
   server: {
     proxy: {
-      'index': proxyEndpoint,
+      index: proxyEndpoint,
       '/logout': proxyEndpoint,
-      '/login': proxyEndpoint,
+      '/login': proxyEndpoint
     },
-    port: 3090,
-  },
-})
+    port: 3090
+  }
+});

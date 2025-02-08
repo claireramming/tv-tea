@@ -1,10 +1,10 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "daisyui";
 
 .logo {
   height: 3.5em;
   width: 3.5em;
-  padding: .25em;
+  padding: 0.25em;
   will-change: filter;
   transition: filter 300ms;
 }
