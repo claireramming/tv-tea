@@ -1,4 +1,4 @@
-import { SimpleEpisode } from "moviedb-promise";
+import { ShowResponse, SimpleEpisode } from "moviedb-promise";
 
 export type FullSeason = {
   air_date?: string;
@@ -9,7 +9,9 @@ export type FullSeason = {
   poster_path?: string;
   season_number: number;
   episodes: SimpleEpisode[];
-  'watch/providers'?: { results: {US: { flatrate: WatchProvider[] } }};
+  providers?: {US: { flatrate: WatchProvider[] } };
+  show?: ShowResponse;
+  watchlistId?: number;
 }
 
 export type SeasonToWatch = FullSeason & WatchListEntry

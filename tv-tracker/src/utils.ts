@@ -1,5 +1,6 @@
 import { ProfileInfo, WatchListEntry } from "./types";
 import { MovieDb, SimpleSeason, TvSeasonResponse } from "moviedb-promise";
+import { toast } from 'react-toastify';
 
 const moviedb = new MovieDb(process.env.TMDB_API_KEY || '');
 
@@ -13,7 +14,6 @@ export function fetchSeasonData(
 ): Promise<TvSeasonResponse>[] {
   if (!series_id || !seasons) return [];
   return seasons.map((season) => {
-    console.log(season)
     return moviedb.seasonInfo({ id: series_id, season_number: season.season_number || 1 });
   });
 }
@@ -72,8 +72,102 @@ export async function addSeasonToWatchList(
       { show_id: showId, season: seasonNumber, status: showStatus },
       token
     );
+    toast.success('Added season to watchlist!', {
+      autoClose: 5000,
+      theme: "colored",
+    });
   } catch (e) {
-    console.error(e);
+    const error = await e.json()
+    if (error?.non_field_errors && error.non_field_errors?.[0].includes('unique set')) {
+      toast.info('Season already in watchlist', {
+        autoClose: 5000,
+        theme: "colored",
+      });
+    } else {
+      console.error(e)
+      toast.error('Error adding season to watchlist', {
+        autoClose: 5000,
+        theme: "colored",
+      });
+    }
+  }
+}
+
+export async function removeSeasonFromWatchList(watchlistId: number| undefined, token: string | undefined) {
+  if (!watchlistId || !token) {
+    console.error('No id or token provided')
+    toast.error('Error removing season from watchlist', {
+      autoClose: 5000,
+      theme: "colored",
+    });
+    return false;
+  }
+  try {
+    await SimpleFetch.delete(`watchlist/${watchlistId}/`, token);
+    toast.info('Season removed from watchlist', {
+      autoClose: 5000,
+      theme: "colored",
+    });
+    return true
+  } catch (e) {
+    console.error(e)
+    toast.error('Error removing season from watchlist', {
+      autoClose: 5000,
+      theme: "colored",
+    });
+    return false
+  }
+}
+
+export async function startWatchingSeason(watchlistId: number | undefined, token: string | undefined) {
+  try {
+    const startDate = new Date().toISOString()
+    await SimpleFetch.patch(`watchlist/${watchlistId}/`, { datetime_started_at: startDate }, token);
+    toast.success('Season moved to In Progress!', {
+      theme: "colored",
+    });
+    return startDate
+
+  } catch (e) {
+    console.error(e)
+    toast.error('Error starting season', {
+      theme: "colored",
+    })
+    return false
+  }
+}
+
+export async function finishWatchingSeason(watchlistId: number | undefined, token: string | undefined) {
+  try {
+    const endDate = new Date().toISOString()
+    await SimpleFetch.patch(`watchlist/${watchlistId}/`, { datetime_finished_at: endDate }, token);
+    toast.success('Season marked as completed!', {
+      theme: "colored",
+    });
+    return endDate
+  } catch (e) {
+    console.error(e)
+    toast.error('Error finishing season', {
+      theme: "colored",
+    })
+    return false
+  }
+}
+
+export async function updateWatchListEntry(
+  watchlistId: number | undefined,
+  data: Record<string, unknown>,
+  token: string | undefined,
+) {
+  try {
+    await SimpleFetch.patch(`watchlist/${watchlistId}/`, data, token);
+    return true
+  } catch (e) {
+    console.error(e)
+    toast.error('Error updating watchlist', {
+      theme: "colored",
+    });
+    return false
   }
 }
 

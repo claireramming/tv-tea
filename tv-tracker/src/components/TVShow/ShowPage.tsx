@@ -15,6 +15,7 @@ export default function ShowPage() {
   const user: User = useContext(UserContext);
 
   const params = useParams();
+  const userLoggedIn: boolean = user?.isAuthenticated || false
   const [show, setShow] = useState<ShowResponse & {
     'watch/providers'?: {
       results: {US: {flatrate: WatchProvider[]}}
@@ -22,8 +23,15 @@ export default function ShowPage() {
     content_ratings?: {results: Rating[]} 
   } >({});
   const [seasonData, setSeasonData] = useState<TvSeasonResponse[]>([]);
+  const [ watchDropdownOpen, setWatchDropdownOpen ] = useState(false);
+
+  function toggleWatchDropdown(e: MouseEvent) {
+    e.preventDefault();
+    setWatchDropdownOpen(!watchDropdownOpen)
+  }
 
   useEffect(() => {
+    setWatchDropdownOpen(false)
     if (!params.id) return setShow({});
     const showPromise = fetchShowData(params.id);
     showPromise.then((showData) => {
@@ -41,7 +49,6 @@ export default function ShowPage() {
     return ratingResults.results.find((rating: Rating) => rating.iso_3166_1 === 'US')?.rating || 'NR';
   }
 
-
   const contentRating = show.content_ratings ? getContentRating(show.content_ratings) : 'NR';
   const genresString: string = show.genres ? show.genres.map((genre: Genre) => genre.name).join(', ') : '';
 
@@ -52,19 +59,27 @@ export default function ShowPage() {
     return <Season key={season.id} data={{ ...season, ...(seasonData?.[i] || {}) }} />;
   }) : <></>;
 
-  const seasonWatchList = show?.seasons ? show.seasons.map((season: FullSeason) => {
-    return (
+  
+  let seasonWatchList = ([<></>])
+  
+  if (!userLoggedIn) {
+    seasonWatchList = ([<li key={0}>Log in to add show seasons to your watchlist</li>]);
+  } else if (show?.seasons) {
+    seasonWatchList = show.seasons.map((season: FullSeason) => {
+     return (
       <li key={season.id}>
         <a
-          onClick={() =>
+          onClick={(e) => {
+            toggleWatchDropdown(e)
             void addSeasonToWatchList(show.id, season.season_number, show.status, user.accessToken)
-          }
+            
+          }}
         >
           Season {season.season_number}
         </a>
       </li>
-    );
-  }) : <></>;
+    )});
+  }
 
   return (
     <>
@@ -87,9 +102,12 @@ export default function ShowPage() {
           </h3>
           <h2 className="font-semibold mt-8">Overview</h2>
           <p className="h-30 overflow-y-auto">{show.overview}</p>
-          <details className="dropdown">
-            <summary className="btn m-1">Add to WatchList</summary>
-            <ul className="menu dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+          <details className='dropdown' open={watchDropdownOpen}>
+            <summary className="btn m-1 bg-secondary" onClick={toggleWatchDropdown}>
+              Add to WatchList
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M4.293 7.793a1 1 0 0 1 1.414 0L12 14.086l6.293-6.293a1 1 0 1 1 1.414 1.414L13.414 15.5a2 2 0 0 1-2.828 0L4.293 9.207a1 1 0 0 1 0-1.414" clip-rule="evenodd"/></svg>
+            </summary>
+            <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
               {seasonWatchList}
             </ul>
           </details>

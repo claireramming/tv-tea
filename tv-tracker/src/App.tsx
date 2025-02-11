@@ -10,6 +10,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { UserContext, User } from './contexts/UserContext';
 import { getUserProfile, createUserProfile } from './utils';
 import Profile from './components/Profile/Profile';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const { user, isAuthenticated, isLoading, loginWithRedirect, getAccessTokenSilently, logout } =
@@ -89,6 +90,7 @@ function App() {
           </Routes>
         </UserContext.Provider>
       </BrowserRouter>
+      <ToastContainer />
     </>
   );
 }

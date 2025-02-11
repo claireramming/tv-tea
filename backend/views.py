@@ -29,7 +29,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 class UserWatchListViewSet(viewsets.ModelViewSet):
     queryset = UserWatchList.objects.all()
     serializer_class = UserWatchListSerializer
-    lookup_field = "user_id"
     
     def get_queryset(self):
         user_id = self.request.user.username.split(".")[1]
@@ -38,13 +37,11 @@ class UserWatchListViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         user_id = request.user.username.split(".")[1]
         request.data["user"] = user_id
-        print(request.data)
         return super().create(request, *args, **kwargs)
     
 
 class UserWatchStatsViewSet(viewsets.ModelViewSet):
     serializer_class = UserWatchStatsSerializer
-    lookup_field = "user_id"
     
     def get_queryset(self):
         user_id = self.request.user.sub
