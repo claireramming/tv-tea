@@ -52,7 +52,6 @@ export default function ShowPage() {
   const contentRating = show.content_ratings ? getContentRating(show.content_ratings) : 'NR';
   const genresString: string = show.genres ? show.genres.map((genre: Genre) => genre.name).join(', ') : '';
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const providers = show?.['watch/providers']?.results?.US ? show['watch/providers'].results?.US?.flatrate : []
 
   const seasonsList = show.seasons ? show.seasons.map((season: FullSeason, i: number) => {
@@ -105,7 +104,9 @@ export default function ShowPage() {
           <details className='dropdown' open={watchDropdownOpen}>
             <summary className="btn m-1 bg-secondary" onClick={toggleWatchDropdown}>
               Add to WatchList
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M4.293 7.793a1 1 0 0 1 1.414 0L12 14.086l6.293-6.293a1 1 0 1 1 1.414 1.414L13.414 15.5a2 2 0 0 1-2.828 0L4.293 9.207a1 1 0 0 1 0-1.414" clip-rule="evenodd"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path fill="currentColor" fillRule="evenodd" d="M4.293 7.793a1 1 0 0 1 1.414 0L12 14.086l6.293-6.293a1 1 0 1 1 1.414 1.414L13.414 15.5a2 2 0 0 1-2.828 0L4.293 9.207a1 1 0 0 1 0-1.414" clipRule="evenodd"/>
+              </svg>
             </summary>
             <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
               {seasonWatchList}

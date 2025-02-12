@@ -6,8 +6,9 @@ import {
   startWatchingSeason,
   finishWatchingSeason,
   updateWatchListEntry,
+  addSeasonToWatchList,
 } from '../../utils';
-import { MovieDb } from 'moviedb-promise';
+import { MovieDb, SimpleSeason } from 'moviedb-promise';
 import UpNext from './UpNext';
 import WatchList from './WatchList';
 import { SeasonToWatch, WatchListEntry } from '../../types';
@@ -17,6 +18,7 @@ export default function WatchListPage(props: { isLoading: boolean; login: () => 
   
 
   const [seasonArray, setSeasonArray] = useState<SeasonToWatch[]>([]);
+  const [addedSeasons, setAddedSeasons] = useState<SimpleSeason[]>([]);
 
   if (props.isLoading) {
     <span className="loading loading-infinity loading-lg"></span>;
@@ -25,6 +27,11 @@ export default function WatchListPage(props: { isLoading: boolean; login: () => 
   async function removeFromWatchList(id: number) {
     const deleted = await removeSeasonFromWatchList(id, user.accessToken);
     if (deleted) setSeasonArray(seasonArray.filter((season) => season.watchlistId !== id));
+  }
+
+  async function addToWatchList(showId: number, season: number, status: string) {
+    const added = await addSeasonToWatchList(showId, season, status, user.accessToken);
+    if (added) setAddedSeasons([...addedSeasons, { showId, season}]);
   }
 
   async function startWatching(id: number) {
@@ -66,22 +73,27 @@ export default function WatchListPage(props: { isLoading: boolean; login: () => 
       const watchList = await getUserWatchList(user?.accessToken || '');
       const seasonArray: SeasonToWatch[] = await Promise.all(watchList.map(async (season: WatchListEntry) => {
         const showInfo = await moviedb.tvInfo({ id: season.show_id, append_to_response: `season/${season.season},season/${season.season}/watch/providers` });
+        console.log(showInfo.seasons, season.season)
+        const seasonId = showInfo.seasons.find((s: {season_number: number}) => s.season_number === season.season).id;
         const { [`season/${season.season}`]: seasonInfo, [`season/${season.season}/watch/providers`]: providers, ...restShow } = showInfo;
-        const seasonObject = {...season, providers: providers?.results, ...seasonInfo, show: restShow, watchlistId: season.id };
+        const seasonObject = {...season, seasonId, providers: providers?.results, ...seasonInfo, show: restShow, watchlistId: season.id };
         return seasonObject
       }));
       setSeasonArray(seasonArray);
     }
     
     void buildWatchList();
-  }, [user]);
+  }, [user, addedSeasons]);
 
   
    
   if (user?.isAuthenticated) {
     return (
       <>
-        <UpNext />
+        <UpNext 
+          watchlist={seasonArray}
+          add={addToWatchList}
+        />
         <WatchList 
           watchlist={seasonArray}
           remove={removeFromWatchList}

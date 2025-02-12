@@ -65,7 +65,7 @@ export async function addSeasonToWatchList(
   seasonNumber: number,
   showStatus: string,
   token: string
-): Promise<void> {
+): Promise<boolean> {
   try {
     await SimpleFetch.post(
       'watchlist/',
@@ -73,23 +73,25 @@ export async function addSeasonToWatchList(
       token
     );
     toast.success('Added season to watchlist!', {
-      autoClose: 5000,
+      autoClose: 3000,
       theme: "colored",
     });
+    return true
   } catch (e) {
     const error = await e.json()
     if (error?.non_field_errors && error.non_field_errors?.[0].includes('unique set')) {
       toast.info('Season already in watchlist', {
-        autoClose: 5000,
+        autoClose: 3000,
         theme: "colored",
       });
     } else {
       console.error(e)
       toast.error('Error adding season to watchlist', {
-        autoClose: 5000,
+        autoClose: 3000,
         theme: "colored",
       });
     }
+    return false
   }
 }
 
@@ -97,7 +99,7 @@ export async function removeSeasonFromWatchList(watchlistId: number| undefined, 
   if (!watchlistId || !token) {
     console.error('No id or token provided')
     toast.error('Error removing season from watchlist', {
-      autoClose: 5000,
+      autoClose: 3000,
       theme: "colored",
     });
     return false;
@@ -105,14 +107,14 @@ export async function removeSeasonFromWatchList(watchlistId: number| undefined, 
   try {
     await SimpleFetch.delete(`watchlist/${watchlistId}/`, token);
     toast.info('Season removed from watchlist', {
-      autoClose: 5000,
+      autoClose: 3000,
       theme: "colored",
     });
     return true
   } catch (e) {
     console.error(e)
     toast.error('Error removing season from watchlist', {
-      autoClose: 5000,
+      autoClose: 3000,
       theme: "colored",
     });
     return false
