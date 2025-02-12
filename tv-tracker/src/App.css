@@ -1,5 +1,7 @@
 @import 'tailwindcss';
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: lemonade --default, dark --prefersdark;
+}
 
 .logo {
   height: 3.5em;

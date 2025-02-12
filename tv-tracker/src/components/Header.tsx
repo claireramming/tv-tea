@@ -48,6 +48,9 @@ export default function Header(props: { logout: () => void, login: () => void })
           >
             {availableOptions}
             <li>
+              <a href='faq'>FAQs and Credits</a>
+            </li>
+            <li>
               <a onClick={user?.isAuthenticated ? props.logout : props.login}>Log {user?.isAuthenticated ? 'out' : 'in'}</a>
             </li>
           </ul>

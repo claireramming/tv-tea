@@ -11,6 +11,7 @@ import { UserContext, User } from './contexts/UserContext';
 import { getUserProfile, createUserProfile } from './utils';
 import Profile from './components/Profile/Profile';
 import { ToastContainer } from 'react-toastify';
+import FAQ from './components/FAQ';
 
 function App() {
   const { user, isAuthenticated, isLoading, loginWithRedirect, getAccessTokenSilently, logout } =
@@ -87,6 +88,7 @@ function App() {
               <Route path=":id" element={<ShowPage />} />
             </Route>
             <Route path="profile" element={<Profile />}/>
+            <Route path="faq" element={<FAQ />} />
           </Routes>
         </UserContext.Provider>
       </BrowserRouter>

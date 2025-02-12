@@ -70,7 +70,7 @@ export default function UpNext(props: { watchlist: SeasonToWatch[], add: (showId
   );
 return (
   <>
-  <div className="bg-neutral p-4 pb-0 font-bold">Up Next:</div>
+  <div className="bg-neutral p-4 pb-0 font-bold text-secondary">Up Next:</div>
   <div className="carousel carousel-center bg-neutral max-w-full space-x-4 p-4 w-full">
       {inProgressEps.map(ep => (
         <div key={ep.episode.id} className="carousel-item p-0! card bg-base-100 w-96 shadow-xl">
