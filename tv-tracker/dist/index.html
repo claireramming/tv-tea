@@ -1,0 +1,18 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="./tv-logo.png" />
+    <link rel="stylesheet" href="./tv-tracker.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TV Tracker</title>
+  </head>
+  {% block content %}
+    <div id="root" />
+  {% endblock %}
+
+  {% block body_javascript %}
+    <script type="module" src="./tv-tracker.es.js"></script>
+  {% endblock %}
+</html>
