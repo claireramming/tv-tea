@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['human-coralie-tvtea-6783c1aa.koyeb.app']
 
 STATIC_ROOT = 'backend/static'
 
