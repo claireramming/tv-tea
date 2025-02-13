@@ -358,7 +358,7 @@ export class SimpleFetch {
     responseNotJson = false,
     formDataRequest = false
   ): Promise<unknown> => {
-    const url = `http://localhost:3000/${endPoint}`;
+    const url = `${process.env.API_URL}/${endPoint}`;
     //await refreshTokensIfNeeded();
     const options = {
       method,

@@ -4,10 +4,6 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
 
-// process.env.VITE_PROXY can be used to overide the default proxyEndpoint
-// in some configuration, http://127.0.0.1 might be needed to make the app work.
-const proxyEndpoint = process.env.VITE_PROXY || 'http://localhost:3000/';
-
 // https://vite.dev/config/
 export default defineConfig({
   define: {
@@ -20,7 +16,7 @@ export default defineConfig({
   },
   build: {
     target: ['esnext'],
-    outDir: path.resolve(__dirname, '../backend/static/tv-tracker/'),
+    outDir: path.resolve(__dirname, './dist/'),
 
     lib: {
       entry: path.resolve(__dirname, 'src/main.tsx'),
@@ -38,15 +34,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
     EnvironmentPlugin({
-      TMDB_API_KEY: ''
+      TMDB_API_KEY: '',
+      API_URL: '',
     })
   ],
   server: {
-    proxy: {
-      index: proxyEndpoint,
-      '/logout': proxyEndpoint,
-      '/login': proxyEndpoint
-    },
     port: 3090
   }
 });
