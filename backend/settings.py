@@ -30,11 +30,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-STATIC_ROOT = ''
+STATIC_ROOT = 'backend/static'
 
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = ('backend/static',)
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:3090']
 
