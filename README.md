@@ -1,5 +1,9 @@
 # TV Tea
 
+TV Tea frontend is deployed on Vercel, backend and db deployed on Koyeb.
+
+[Try it live here!](https://tv-tea.vercel.app/)
+
 TV Tea is an app like Trakt or Serializd that lets users track the TV Shows they are watching. What sets TV Tea apart is the focus on showing the user what episodes are ready to watch across platforms, and most importantly, _what_ platform they can watch the episode on. TV Tea is built with React/Typscript and Django and uses the TMDB API for show info.
 
 
