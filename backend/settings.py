@@ -34,7 +34,7 @@ STATIC_ROOT = 'backend/static'
 
 STATIC_URL = '/static/'
 
-CORS_ALLOWED_ORIGINS = ['http://localhost:3090']
+CORS_ALLOWED_ORIGINS = ['http://localhost:3090', 'https://tv-tea.vercel.app']
 
 # Application definition
 
