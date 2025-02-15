@@ -1,13 +1,14 @@
 import { SeasonToWatch } from "../../types";
 import ProgressBar from "../common/ProgressBar";
 import ProviderImage from "../common/ProviderImage";
+import defaultImage from '../../assets/tv-screen.jpg';
 
 export default function SeasonTile(props: {
   season: SeasonToWatch,
-  remove: (id: number) => void,
-  start: (id: number) => void,
-  finish: (id: number) => void,
-  update: (id: number, episodes: number) => void,
+  remove: (id: number|undefined) => void,
+  start: (id: number|undefined) => void,
+  finish: (id: number|undefined) => void,
+  update: (id: number|undefined, episodes: number|undefined) => void,
 }) {
 
   const episodesWatched = props.season.num_episodes_watched;
@@ -33,13 +34,13 @@ export default function SeasonTile(props: {
     <p>Completed: {new Date(props.season.datetime_finished_at).toLocaleDateString()}</p>) : (<></>)
 
   return (
-    <div className="card card-side w-full h-96 bg-base-100 shadow-xl mb-4">
+    <div className="card p-0! max-w-[500px] sm:max-w-full w-full h-96 sm:h-72 bg-base-100 shadow-xl mb-4 sm:card-side">
       <figure>
-        <img src={`https://image.tmdb.org/t/p/w500${props.season.poster_path}`} alt={props.season.name} />
+        <img className='max-w-[500px] sm:max-w-[192px]!' src={props.season?.poster_path ? `https://image.tmdb.org/t/p/w500${props.season.poster_path}` : defaultImage} alt={props.season.name} />
       </figure>
       <div className="card-body">
         <div className='flex justify-between'>
-          <h1 className="card-title">{props.season.show?.name}</h1>
+          <h1 className="card-title text-4xl!">{props.season.show?.name}</h1>
           <div>
             {startDate}
             {endDate}
@@ -47,7 +48,7 @@ export default function SeasonTile(props: {
         </div>
         <h2 className="card-title">{props.season.name} <div className="badge badge-primary">{props.season.episodes.length} Episodes</div></h2>
         <div className="flex justify-between">
-          <div className='h-full'><ProviderImage count={1} providers={providers} /></div>
+          <div className='shrink-0 mr-4 size-10 sm:size-22'><ProviderImage count={1} providers={providers} /></div>
           {progress}
         </div>
         <div className="card-actions justify-end">

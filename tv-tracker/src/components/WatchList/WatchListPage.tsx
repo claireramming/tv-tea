@@ -73,7 +73,6 @@ export default function WatchListPage(props: { isLoading: boolean; login: () => 
       const watchList = await getUserWatchList(user?.accessToken || '');
       const seasonArray: SeasonToWatch[] = await Promise.all(watchList.map(async (season: WatchListEntry) => {
         const showInfo = await moviedb.tvInfo({ id: season.show_id, append_to_response: `season/${season.season},season/${season.season}/watch/providers` });
-        console.log(showInfo.seasons, season.season)
         const seasonId = showInfo.seasons.find((s: {season_number: number}) => s.season_number === season.season).id;
         const { [`season/${season.season}`]: seasonInfo, [`season/${season.season}/watch/providers`]: providers, ...restShow } = showInfo;
         const seasonObject = {...season, seasonId, providers: providers?.results, ...seasonInfo, show: restShow, watchlistId: season.id };

@@ -32,3 +32,7 @@ This app is in MVP stage, there is a lot more I'd like to add to it!
 ### Credits:
 This product uses the TMDB API but is not endorsed or certified by TMDB.
 
+Default background image for missing episode and season images by upklyak on Freepik.
+
+Logo PNG Designed By 588ku from [PNGTree](https://pngtree.com/freepng/color-old-tv-video-logo_4665955.html?sol=downref&id=bef)
+
