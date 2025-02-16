@@ -34,11 +34,12 @@ export default function WatchListPage(props: { isLoading: boolean; login: () => 
     if (added) setAddedSeasons([...addedSeasons, { showId, season}]);
   }
 
-  async function startWatching(id: number) {
-    const started: string | false = await startWatchingSeason(id, user.accessToken);
+  async function startWatching(id: number, prewatchedEps: number = 0) {
+    const started: string | false = await startWatchingSeason(id, prewatchedEps, user.accessToken);
     if (started) setSeasonArray(seasonArray.map((season) => {
       if (season.watchlistId === id) {
         season.datetime_started_at = started;
+        season.num_episodes_watched = prewatchedEps;
       }
       return season;
     }));
@@ -49,13 +50,16 @@ export default function WatchListPage(props: { isLoading: boolean; login: () => 
     if (finished) setSeasonArray(seasonArray.map((season) => {
       if (season.watchlistId === id) {
         season.datetime_finished_at = finished;
+        if (!season.datetime_started_at) {
+          season.datetime_started_at = finished;
+        }
       }
       return season;
     }));
   }
 
-  async function watchEpisode(id:number, watchedEps: number) {
-    const updated = await updateWatchListEntry(id, {num_episodes_watched: watchedEps}, user.accessToken);
+  async function watchEpisode(id:number, watchedEps: number, watchtime: number) {
+    const updated = await updateWatchListEntry(id, {num_episodes_watched: watchedEps, watchtime}, user.accessToken);
     if (updated) setSeasonArray(seasonArray.map((season) => {
       if (season.watchlistId === id) {
         season.num_episodes_watched = watchedEps;

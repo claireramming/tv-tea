@@ -10,8 +10,6 @@ router.register(r"watchlist", views.UserWatchListViewSet, basename="watchlist")
 router.register(r"watchstats", views.UserWatchStatsViewSet, basename="watchstats")
 
 urlpatterns = [
-    path("", views.index, name="index"),
     path('admin/', admin.site.urls),
-    path('api/private', views.private),
     path('', include(router.urls)),
 ]

@@ -121,10 +121,10 @@ export async function removeSeasonFromWatchList(watchlistId: number| undefined, 
   }
 }
 
-export async function startWatchingSeason(watchlistId: number | undefined, token: string | undefined) {
+export async function startWatchingSeason(watchlistId: number | undefined, prewatchedEpisodes: number, token: string | undefined) {
   try {
     const startDate = new Date().toISOString()
-    await SimpleFetch.patch(`watchlist/${watchlistId}/`, { datetime_started_at: startDate }, token);
+    await SimpleFetch.patch(`watchlist/${watchlistId}/`, { num_episodes_watched: prewatchedEpisodes || 0, datetime_started_at: startDate }, token);
     toast.success('Season moved to In Progress!', {
       theme: "colored",
     });
@@ -209,7 +209,7 @@ export class SimpleFetch {
    */
   static post = async (
     endPoint: string,
-    body: BodyInit,
+    body: Record<string, unknown>,
     token: string | undefined = undefined,
     additionalHeaders = {},
     otherOptions = {},
@@ -238,7 +238,7 @@ export class SimpleFetch {
    */
   static put = async (
     endPoint: string,
-    body: BodyInit,
+    body: Record<string, unknown>,
     token: string | undefined = undefined,
     additionalHeaders = {},
     otherOptions = {}
@@ -305,7 +305,7 @@ export class SimpleFetch {
    */
   static patch = async (
     endPoint: string,
-    body: BodyInit,
+    body: Record<string, unknown>,
     token: string | undefined = undefined,
     additionalHeaders = {},
     otherOptions = {}
@@ -352,7 +352,7 @@ export class SimpleFetch {
     method: string,
     token: string | undefined = undefined,
     additionalHeaders = {},
-    body: BodyInit | undefined,
+    body: Record<string, unknown> | undefined,
     otherOptions: RequestInit = {},
     contentType = 'application/json',
     responseNotJson = false,

@@ -7,7 +7,7 @@ export default function WatchList(props: {
   remove: (id: number) => void,
   start: (id: number) => void,
   finish: (id: number) => void,
-  update: (id: number, episodes: number) => void,
+  update: (id: number, episodes: number, watchtime: number) => void,
 }) {  
   const [tabIndex, setTabIndex] = useState<number>(1);
 
@@ -22,7 +22,7 @@ export default function WatchList(props: {
 
   return (
     <>
-    <div role="tablist" className="tabs tabs-lg tabs-border flex justify-center items-center sticky top-0 z-10 bg-white dark:bg-slate h-18">
+    <div role="tablist" className="tabs tabs-lg tabs-border flex justify-center items-center sticky top-0 z-10 bg-white dark:bg-neutral h-18">
       <a role="tab" className={`tab ${tabIndex === 0 ? 'tab-active' : ''}`} onClick={() => setTabIndex(0)}>To Watch</a>
       <a role="tab" className={`tab ${tabIndex === 1 ? 'tab-active' : ''}`} onClick={() => setTabIndex(1)}>In Progress</a>
       <a role="tab" className={`tab ${tabIndex === 2 ? 'tab-active' : ''}`} onClick={() => setTabIndex(2)}>Completed</a>
