@@ -11,6 +11,9 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 class UserWatchListViewSet(viewsets.ModelViewSet):
     queryset = UserWatchList.objects.all()
     serializer_class = UserWatchListSerializer
+    filterset_fields = {
+        'datetime_finished_at': ['gte']
+    }
     
     def get_queryset(self):
         user_id = self.request.user.username.split(".")[1]

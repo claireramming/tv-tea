@@ -3,7 +3,7 @@ import { SeasonToWatch } from "../../types";
 import ProviderImage from "../common/ProviderImage";
 import  defaultImage from '../../assets/tv-screen.jpg';
 
-export default function UpNext(props: { watchlist: SeasonToWatch[], add: (showId: number, id: number) => void }) {
+export default function UpNext(props: { isLoading: boolean, watchlist: SeasonToWatch[], add: (showId: number, id: number) => void }) {
 
   const notStarted = props.watchlist.filter((season: SeasonToWatch) => !season.datetime_started_at);
   const inProgress = props.watchlist.filter((season: SeasonToWatch) => season.datetime_started_at && !season.datetime_finished_at);
@@ -64,10 +64,22 @@ export default function UpNext(props: { watchlist: SeasonToWatch[], add: (showId
     return acc;
   }, [])
 
-  if (!inProgressEps.length && !readyToWatch.length && !nextSeasons.length) return (
+  if (!inProgressEps.length && !readyToWatch.length && !nextSeasons.length) {
+    const defaultText = "Add more shows to your watchlist to see what's up next";
+    const loading = (
+      <>
+        <span className="loading loading-spinner text-primary"></span>
+        <span className="loading loading-spinner text-secondary"></span>
+        <span className="loading loading-spinner text-accent"></span>
+      </>
+    )
+    
+    return (
     <div className="bg-neutral h-96 font-bold flex items-center justify-center">
-      <div className='m-auto'>Add more shows to your watchlist to see what&apos;s up next</div></div>
+      <div className='m-auto'>{props.isLoading ? loading : defaultText}</div>
+    </div>
   );
+  }
 return (
   <>
   <div className="bg-neutral p-4 pb-0 font-bold text-secondary">Up Next:</div>

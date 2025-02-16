@@ -12,13 +12,13 @@ import { getUserProfile, createUserProfile } from './utils';
 import Profile from './components/Profile/Profile';
 import { ToastContainer } from 'react-toastify';
 import FAQ from './components/FAQ';
+import StatsPage from './components/Stats/StatsPage';
 
 function App() {
-  const { user, isAuthenticated, isLoading, loginWithRedirect, getAccessTokenSilently, logout } =
+  const { user, isAuthenticated, loginWithRedirect, getAccessTokenSilently, logout } =
     useAuth0();
 
   const [userMetadata, setUserMetadata] = useState({} as User);
-  const [isLoadingUser, setIsLoadingUser] = useState(true);
 
   const logoutOfApp = async () => {
     await logout({ logoutParams: { returnTo: window.location.origin } });
@@ -39,7 +39,6 @@ function App() {
   useEffect(() => {
     const getUserMetadata = async () => {
       if (!user?.sub) return;
-      setIsLoadingUser(true);
       const domain = process.env.AUTH0_DOMAIN;
   
       try {
@@ -61,7 +60,6 @@ function App() {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const user_metadata: User = await metadataResponse.json();
         setUserMetadata({ ...user, isAuthenticated, ...user_metadata, accessToken });
-        setIsLoadingUser(false);
         getOrCreateUserProfile(user.sub, accessToken);
       } catch (e) {
         console.error(e);
@@ -69,9 +67,7 @@ function App() {
     };
 
     if (!user?.sub) return;
-    getUserMetadata().then(() =>
-      getOrCreateUserProfile(userMetadata.sub || '', userMetadata.accessToken || '')
-    );
+    getUserMetadata();
   }, [user?.sub]);
 
   return (
@@ -82,13 +78,14 @@ function App() {
           <Routes>
             <Route
               path="/"
-              element={<WatchListPage isLoading={isLoading || isLoadingUser} login={() => loginWithRedirect()} />}
+              element={<WatchListPage login={() => loginWithRedirect()} />}
             />
             <Route path="show">
               <Route path=":id" element={<ShowPage />} />
             </Route>
             <Route path="profile" element={<Profile />}/>
             <Route path="faq" element={<FAQ />} />
+            <Route path="stats" element={<StatsPage />} />
           </Routes>
         </UserContext.Provider>
       </BrowserRouter>

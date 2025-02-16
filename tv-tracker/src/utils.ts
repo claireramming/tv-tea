@@ -46,6 +46,24 @@ export async function getUserWatchList(token: string): Promise<WatchListEntry[] 
   return [];
 }
 
+export async function getUserStats(token: string): Promise<StatsInfo> {
+  try {
+    return await SimpleFetch.get('watchstats/', {}, token);
+  } catch (e) {
+    console.error(e);
+    return null
+  }
+}
+
+export async function getSeasonsFinishedSince(startDate: Date, token: string): Promise<WatchListEntry[] | []> {
+  try {
+    return await SimpleFetch.get('watchlist/', { datetime_finished_at__gte: startDate }, token);
+  } catch (e) {
+    console.error(e)
+  }
+  return [];
+}
+
 /**
  * Creates a user profile
  * @param user id of the user

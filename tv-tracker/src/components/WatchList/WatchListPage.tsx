@@ -13,16 +13,12 @@ import UpNext from './UpNext';
 import WatchList from './WatchList';
 import { SeasonToWatch, WatchListEntry } from '../../types';
 
-export default function WatchListPage(props: { isLoading: boolean; login: () => void }) {
+export default function WatchListPage(props: { login: () => void }) {
   const user: User = useContext(UserContext);
   
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [seasonArray, setSeasonArray] = useState<SeasonToWatch[]>([]);
   const [addedSeasons, setAddedSeasons] = useState<SimpleSeason[]>([]);
-
-  if (props.isLoading) {
-    <span className="loading loading-infinity loading-lg"></span>;
-  }
 
   async function removeFromWatchList(id: number) {
     const deleted = await removeSeasonFromWatchList(id, user.accessToken);
@@ -70,6 +66,7 @@ export default function WatchListPage(props: { isLoading: boolean; login: () => 
 
   useEffect(() => {
     if (!user?.isAuthenticated) return
+    setIsLoading(true);
 
     const moviedb = new MovieDb(process.env.TMDB_API_KEY || '');
 
@@ -85,7 +82,7 @@ export default function WatchListPage(props: { isLoading: boolean; login: () => 
       setSeasonArray(seasonArray);
     }
     
-    void buildWatchList();
+    void buildWatchList().then(() => setIsLoading(false));
   }, [user, addedSeasons]);
 
   
@@ -94,10 +91,12 @@ export default function WatchListPage(props: { isLoading: boolean; login: () => 
     return (
       <>
         <UpNext 
+          isLoading={isLoading}
           watchlist={seasonArray}
           add={addToWatchList}
         />
         <WatchList 
+          isLoading={isLoading}
           watchlist={seasonArray}
           remove={removeFromWatchList}
           start={startWatching}

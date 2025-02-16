@@ -3,6 +3,7 @@ import { SeasonToWatch } from "../../types";
 import SeasonTile from "./SeasonTile";
 
 export default function WatchList(props: { 
+  isLoading: boolean,
   watchlist: SeasonToWatch[],
   remove: (id: number) => void,
   start: (id: number) => void,
@@ -34,7 +35,14 @@ export default function WatchList(props: {
           <SeasonTile season={season} remove={props.remove} start={props.start} finish={props.finish} update={props.update}/>
           </div>
         ) 
-        }) : (<div className="h-72 flex items-center justify-center"><div>No Seasons Found</div></div>)
+        }) : props.isLoading ? (
+          <>
+            <span className="loading loading-spinner text-primary"></span>
+            <span className="loading loading-spinner text-secondary"></span>
+            <span className="loading loading-spinner text-accent"></span>
+          </>
+        )
+        : (<div className="h-72 flex items-center justify-center"><div>No Seasons Found</div></div>)
       }
     </>
   )

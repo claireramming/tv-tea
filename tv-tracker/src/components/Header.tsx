@@ -9,9 +9,8 @@ export default function Header(props: { logout: () => void, login: () => void })
 
   const availableOptions = user?.isAuthenticated ? (
     <>
-      <li>
-        <a href='profile'>Profile</a>
-      </li>
+      <li><a href='profile'>Profile</a></li>
+      <li><a href='stats'>Stats</a></li>
     </>
   ) : (<></>);
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function AddSeasonModal(props: {episodeCount: number, watchlistId: number, start: (id: number|undefined) => void, finish: (id: number|undefined) => void}) {
+export default function AddSeasonModal(props: {episodeCount: number, watchlistId: number, start: (id: number|undefined, preWatched: number) => void, finish: (id: number|undefined) => void}) {
   const [preWatched, setPreWatched] = useState<number>(0);
 
   return (
