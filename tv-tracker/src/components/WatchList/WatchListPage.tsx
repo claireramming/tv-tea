@@ -94,6 +94,8 @@ export default function WatchListPage(props: { login: () => void }) {
           isLoading={isLoading}
           watchlist={seasonArray}
           add={addToWatchList}
+          start={startWatching}
+          update={watchEpisode}
         />
         <WatchList 
           isLoading={isLoading}

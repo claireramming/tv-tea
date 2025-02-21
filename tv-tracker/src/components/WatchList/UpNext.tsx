@@ -3,20 +3,26 @@ import { SeasonToWatch } from "../../types";
 import ProviderImage from "../common/ProviderImage";
 import  defaultImage from '../../assets/tv-screen.jpg';
 
-export default function UpNext(props: { isLoading: boolean, watchlist: SeasonToWatch[], add: (showId: number, id: number) => void }) {
+export default function UpNext(props: { 
+  isLoading: boolean, 
+  watchlist: SeasonToWatch[], 
+  add: (showId: number, id: number) => void, 
+  start: (id: number) => void, 
+  update: (id: number, episodes: number, watchtime: number) => void
+}) {
 
   const notStarted = props.watchlist.filter((season: SeasonToWatch) => !season.datetime_started_at);
   const inProgress = props.watchlist.filter((season: SeasonToWatch) => season.datetime_started_at && !season.datetime_finished_at);
   const completed = props.watchlist.filter((season: SeasonToWatch) => season.datetime_finished_at);
-  const today: Date = new Date();
+  const today: string = new Date().toLocaleDateString('en-CA');
 
   const inProgressEps = inProgress.reduce((acc: SeasonToWatch[], season: SeasonToWatch) => {
     if (season.num_episodes_watched < (season.episodes.length || 0)) {
       const nextEpisode: Episode = season.episodes[season.num_episodes_watched];
       if (!nextEpisode?.air_date) return acc;
-      const nextEpisodeAirDate: Date = new Date(nextEpisode.air_date);
-      if (nextEpisodeAirDate < today) {
+      if (nextEpisode.air_date < today) {
         acc.push({
+          watchlistId: season.id,
           showName: season?.show?.name || '',
           seasonName: season.name,
           episode: nextEpisode,
@@ -45,7 +51,7 @@ export default function UpNext(props: { isLoading: boolean, watchlist: SeasonToW
       const alreadyStarted = inProgress.find((s: SeasonToWatch) => s.seasonId === nextSeasonId);
       const alreadyAdded = notStarted.find((s: SeasonToWatch) => s.seasonId === nextSeasonId);
       if (alreadyAdded || alreadyStarted) return acc;
-      const nextSeasonAirDate = nextSeason?.air_date ? new Date(nextSeason.air_date) : '';
+      const nextSeasonAirDate = nextSeason?.air_date;
       if (nextSeasonAirDate && nextSeasonAirDate < today) {
         acc.push({...nextSeason, showName: season.show.name, showId: season.show.id, status: season.status});
       }
@@ -54,9 +60,9 @@ export default function UpNext(props: { isLoading: boolean, watchlist: SeasonToW
   }, [])
 
   const readyToWatch = notStarted.reduce((acc: SeasonToWatch[], season: SeasonToWatch) => {
-    const airDate = new Date(season.air_date);
+    const airDate = season?.air_date;
     if (airDate && airDate < today) {
-      const episodesReady = season.episodes.reduce((acc: number, episode: Episode) => {return episode?.air_date && new Date(episode.air_date) < today ? acc + 1 : acc}, 0)
+      const episodesReady = season.episodes.reduce((acc: number, episode: Episode) => {return episode?.air_date && episode.air_date < today ? acc + 1 : acc}, 0)
       if (!episodesReady) return acc;
       season['episodesReady'] = episodesReady
       acc.push({...season, episodesReady});
@@ -96,10 +102,11 @@ return (
               <h2 className="card-title">{ep.showName}</h2>
               <h3>{ep.seasonName}</h3>
             </div>
-            <div className="badge badge-secondary">Episode {ep.episode.episode_number}</div>
+            <div className='flex gap-4'><div className="badge badge-secondary">Episode {ep.episode.episode_number}</div><div>{ep.episode?.runtime ? `${ep.episode.runtime} mins` : ''}</div></div>
             <p className='max-h-16 overflow-y-auto'>{ep.episode?.overview || ''}</p>
-            <div className="card-actions justify-end">
+            <div className="card-actions justify-between">
               <ProviderImage count={1} providers={ep.providers} />
+              <button className="btn btn-primary mt-auto" onClick={() => props.update(ep.watchlistId, ep.episode.episode_number, ep.episode.runtime)}>Mark As Watched</button>
             </div>
           </div>
         </div>
@@ -120,8 +127,9 @@ return (
             </div>
             <div className="badge badge-secondary">{season.episodesReady} Ready</div>
             <p className='max-h-16 overflow-y-auto'>{season?.overview || ''}</p>
-            <div className="card-actions justify-end">
+            <div className="card-actions justify-between">
               <ProviderImage count={1} providers={season.providers?.US?.flatrate || []} />
+              <button className="btn btn-primary mt-auto" onClick={() => props.start(season.id)}>Start Watching</button>
             </div>
           </div>
         </div>

@@ -39,3 +39,9 @@
 .read-the-docs {
   color: #888;
 }
+
+@media (width < 40rem) {
+  .hide-small {
+    display: none;
+  }
+}

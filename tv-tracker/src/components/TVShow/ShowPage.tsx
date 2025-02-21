@@ -9,6 +9,7 @@ import { addSeasonToWatchList } from '../../utils';
 import { FullSeason, Rating, WatchProvider } from '../../types';
 import ProviderImage from '../common/ProviderImage';
 import { fetchSeasonData, fetchShowData } from '../../utils';
+import '@/App.css';
 
 export default function ShowPage() {
   
@@ -84,14 +85,14 @@ export default function ShowPage() {
     <>
       <img
         src={imageBaseUrl + 'original' + show.backdrop_path}
-        className="absolute opacity-25 z-0 h-128 w-full min-w-3xl object-cover"
+        className="absolute opacity-25 z-[0] h-128 w-full sm:min-w-3xl object-cover"
         alt={show.name}
       />
-      <div className="relative py-4 px-8 flex flex-col gap-4 min-w-3xl z-10">
+      <div className="relative py-4 px-8 flex flex-col gap-4 sm:min-w-3xl z-[10]">
         <div className="h-128">
           <img
             src={imageBaseUrl + 'w300' + show.poster_path}
-            className="w-80 float-left mr-8 rounded-xl"
+            className="relative hide-small w-80 float-left mr-8 rounded-xl z-[10] "
             alt={show.name}
           />
           <h1 className="mt-8">{show.name}</h1>
@@ -117,7 +118,7 @@ export default function ShowPage() {
         </div>
         <div>
           <h2 className="mb-4">Seasons</h2>
-          <div className="join join-vertical bg-base-100">{seasonsList}</div>
+          <div className="join join-vertical bg-base-100 w-full">{seasonsList}</div>
         </div>
       </div>
     </>

@@ -15,7 +15,7 @@ export default function Header(props: { logout: () => void, login: () => void })
   ) : (<></>);
 
   return (
-    <div className="navbar justify-between bg-base-100 sticky top-0 z-5">
+    <div className="navbar justify-between bg-base-100 sticky top-0 z-[15]">
       <div className="">
         <img src={tvLogo} className="logo" alt="tv tracker" />
       </div>
