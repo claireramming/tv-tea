@@ -15792,7 +15792,7 @@ function Xq() {
     /* @__PURE__ */ R.jsx(uq, {})
   ] });
 }
-var Ak = { AUTH0_CLIENT_ID: "wS4HRXFwBb5ElksvHEovIb4RVQYif8QT" };
+var Ak = { AUTH0_CLIENT_ID: "GBh8oRP2oMxNccphRWdM2ZgRejR4RGDa" };
 qc.createRoot(document.getElementById("root")).render(
   /* @__PURE__ */ R.jsx(Y.StrictMode, { children: /* @__PURE__ */ R.jsx(
     gc,
