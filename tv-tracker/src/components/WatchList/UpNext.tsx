@@ -106,7 +106,7 @@ return (
             <p className='max-h-16 overflow-y-auto'>{ep.episode?.overview || ''}</p>
             <div className="card-actions justify-between">
               <ProviderImage count={1} providers={ep.providers} />
-              <button className="btn btn-primary mt-auto" onClick={() => props.update(ep.watchlistId, ep.episode.episode_number, ep.episode.runtime)}>Mark As Watched</button>
+              <button className="btn btn-primary mt-auto" onClick={() => props.update(ep.watchlistId, ep.episode.episode_number, ep.episode.runtime || 0)}>Mark As Watched</button>
             </div>
           </div>
         </div>

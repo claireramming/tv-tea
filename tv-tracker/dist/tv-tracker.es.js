@@ -14517,7 +14517,7 @@ function ib(d) {
   ] }) }) }, d.data.id);
 }
 function Nb() {
-  const d = new tJ.MovieDb("2a45495eb00bed3267d8daa48231f4d5"), [e, S] = Y.useState(), [k, m] = Y.useState(""), [q, z] = Y.useState([]), u = q.map((j) => /* @__PURE__ */ R.jsx(ib, { data: j, handleClick: U }, j.id));
+  const d = new tJ.MovieDb(""), [e, S] = Y.useState(), [k, m] = Y.useState(""), [q, z] = Y.useState([]), u = q.map((j) => /* @__PURE__ */ R.jsx(ib, { data: j, handleClick: U }, j.id));
   function c(j) {
     m(j.target.value), clearTimeout(e), S(setTimeout(() => void M(j.target.value), 300));
   }
@@ -15000,7 +15000,7 @@ function uq(d) {
     return Nl.createElement("div", { tabIndex: -1, className: w(o), "data-stacked": S, style: Q, key: `c-${o}` }, x.map(({ content: tt, props: nt }) => Nl.createElement(mq, { ...nt, stacked: S, collapseAll: g, isIn: u(nt.toastId, nt.containerId), key: `t-${nt.key}` }, tt)));
   }));
 }
-const fk = new tJ.MovieDb("2a45495eb00bed3267d8daa48231f4d5");
+const fk = new tJ.MovieDb("");
 function cq(d) {
   return fk.tvInfo({ id: d, append_to_response: "watch/providers,content_ratings" });
 }
@@ -15222,7 +15222,7 @@ class Sa {
    * @returns {Promise<Object>|Error}
    */
   static baseFetch = async (e, S, k = void 0, m = {}, q, z = {}, u = "application/json", c = !1, U = !1) => {
-    const M = `https://human-coralie-tvtea-6783c1aa.koyeb.app/${e}`, j = {
+    const M = `/${e}`, j = {
       method: S,
       headers: {
         Authorization: `Bearer ${k || ""}`,
@@ -15397,7 +15397,7 @@ function Rq(d) {
           /* @__PURE__ */ R.jsx("p", { className: "max-h-16 overflow-y-auto", children: U.episode?.overview || "" }),
           /* @__PURE__ */ R.jsxs("div", { className: "card-actions justify-between", children: [
             /* @__PURE__ */ R.jsx(jm, { count: 1, providers: U.providers }),
-            /* @__PURE__ */ R.jsx("button", { className: "btn btn-primary mt-auto", onClick: () => d.update(U.watchlistId, U.episode.episode_number, U.episode.runtime), children: "Mark As Watched" })
+            /* @__PURE__ */ R.jsx("button", { className: "btn btn-primary mt-auto", onClick: () => d.update(U.watchlistId, U.episode.episode_number, U.episode.runtime || 0), children: "Mark As Watched" })
           ] })
         ] })
       ] }, U.episode.id)),
@@ -15581,7 +15581,7 @@ function Hq(d) {
   return Y.useEffect(() => {
     if (!e?.isAuthenticated) return;
     k(!0);
-    const f = new tJ.MovieDb("2a45495eb00bed3267d8daa48231f4d5");
+    const f = new tJ.MovieDb("");
     async function w() {
       const g = await bq(e?.accessToken || ""), o = await Promise.all(g.map(async (x) => {
         const Q = await f.tvInfo({ id: x.show_id, append_to_response: `season/${x.season},season/${x.season}/watch/providers` }), tt = Q.seasons.find((qt) => qt.season_number === x.season).id, { [`season/${x.season}`]: nt, [`season/${x.season}/watch/providers`]: Zt, ...yt } = Q;
@@ -15742,7 +15742,7 @@ function vq() {
     ] })
   ] }) : /* @__PURE__ */ R.jsx("div", { className: "hero min-h-screen bg-base-200", children: /* @__PURE__ */ R.jsx("div", { className: "hero-content text-center", children: /* @__PURE__ */ R.jsx("div", { className: "max-w-md", children: /* @__PURE__ */ R.jsx("div", { children: "Please log in to see your stats" }) }) }) });
 }
-var wq = { AUTH0_DOMAIN: "dev-mxo5ack7pqfh6xcm.us.auth0.com" };
+var wq = {};
 function Xq() {
   const { user: d, isAuthenticated: e, loginWithRedirect: S, getAccessTokenSilently: k, logout: m } = Fc(), [q, z] = Y.useState({}), u = async () => {
     await m({ logoutParams: { returnTo: window.location.origin } }), z({});
@@ -15792,12 +15792,12 @@ function Xq() {
     /* @__PURE__ */ R.jsx(uq, {})
   ] });
 }
-var Ak = { AUTH0_DOMAIN: "dev-mxo5ack7pqfh6xcm.us.auth0.com", AUTH0_CLIENT_ID: "GBh8oRP2oMxNccphRWdM2ZgRejR4RGDa" };
+var Ak = { AUTH0_CLIENT_ID: "wS4HRXFwBb5ElksvHEovIb4RVQYif8QT" };
 qc.createRoot(document.getElementById("root")).render(
   /* @__PURE__ */ R.jsx(Y.StrictMode, { children: /* @__PURE__ */ R.jsx(
     gc,
     {
-      domain: Ak.AUTH0_DOMAIN,
+      domain: Ak.AUTH0_DOMAIN || "",
       clientId: Ak.AUTH0_CLIENT_ID,
       authorizationParams: {
         redirect_uri: window.location.origin,
