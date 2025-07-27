@@ -7,6 +7,7 @@ import {
   finishWatchingSeason,
   updateWatchListEntry,
   addSeasonToWatchList,
+  ignoreNewSeason,
 } from '../../utils';
 import { MovieDb, SimpleSeason } from 'moviedb-promise';
 import UpNext from './UpNext';
@@ -54,6 +55,14 @@ export default function WatchListPage(props: { login: () => void }) {
     }));
   }
 
+  async function ignoreSeason(season) {
+    const ignored = await ignoreNewSeason(season.id, season.season_number, season.status, user.accessToken);
+    if (ignored) {
+      ignored.seasonId = season.id
+      setSeasonArray([...seasonArray, ignored])
+    };
+  }
+
   async function watchEpisode(id:number, watchedEps: number, watchtime: number) {
     const updated = await updateWatchListEntry(id, {num_episodes_watched: watchedEps, watchtime}, user.accessToken);
     if (updated) setSeasonArray(seasonArray.map((season) => {
@@ -95,6 +104,7 @@ export default function WatchListPage(props: { login: () => void }) {
           watchlist={seasonArray}
           add={addToWatchList}
           start={startWatching}
+          ignore={ignoreSeason}
           update={watchEpisode}
         />
         <WatchList 

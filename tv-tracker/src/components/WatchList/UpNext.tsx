@@ -8,11 +8,12 @@ export default function UpNext(props: {
   watchlist: SeasonToWatch[], 
   add: (showId: number, id: number) => void, 
   start: (id: number) => void, 
+  ignore: (id: number) => void,
   update: (id: number, episodes: number, watchtime: number) => void
 }) {
 
-  const notStarted = props.watchlist.filter((season: SeasonToWatch) => !season.datetime_started_at);
-  const inProgress = props.watchlist.filter((season: SeasonToWatch) => season.datetime_started_at && !season.datetime_finished_at);
+  const notStarted = props.watchlist.filter((season: SeasonToWatch) => !season.datetime_started_at && !season.datetime_removed_at);
+  const inProgress = props.watchlist.filter((season: SeasonToWatch) => season.datetime_started_at && !season.datetime_finished_at && !season.datetime_removed_at);
   const completed = props.watchlist.filter((season: SeasonToWatch) => season.datetime_finished_at);
   const today: string = new Date().toLocaleDateString('en-CA');
 
@@ -50,7 +51,8 @@ export default function UpNext(props: {
       const nextSeasonId = nextSeason.id;
       const alreadyStarted = inProgress.find((s: SeasonToWatch) => s.seasonId === nextSeasonId);
       const alreadyAdded = notStarted.find((s: SeasonToWatch) => s.seasonId === nextSeasonId);
-      if (alreadyAdded || alreadyStarted) return acc;
+      const removedFromList = props.watchlist.find((s: SeasonToWatch) => s.seasonId === nextSeasonId && s.datetime_removed_at);
+      if (alreadyAdded || alreadyStarted || removedFromList) return acc;
       const nextSeasonAirDate = nextSeason?.air_date;
       if (nextSeasonAirDate && nextSeasonAirDate < today) {
         acc.push({...nextSeason, showName: season.show.name, showId: season.show.id, status: season.status});
@@ -152,6 +154,7 @@ return (
           <div className="badge badge-secondary">{season?.episode_count} Episodes</div>
           <p className='max-h-24 overflow-y-auto'>{season?.overview || ''}</p>
           <div className="grow-1 card-actions justify-end">
+            <button className='btn btn-secondary mt-auto' onClick={() => props.ignore(season)}>Ignore</button>
             <button className="btn btn-primary mt-auto" onClick={() => props.add(season.showId, season.season_number, season.status)}>Add to Watchlist</button>
           </div>
         </div>

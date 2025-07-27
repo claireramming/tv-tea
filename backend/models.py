@@ -28,6 +28,7 @@ class UserWatchList(models.Model):
     datetime_added_at = models.DateTimeField(auto_now_add=True)
     datetime_started_at = models.DateTimeField(null=True, blank=True)
     datetime_finished_at = models.DateTimeField(null=True, blank=True)
+    datetime_removed_at = models.DateTimeField(null=True, blank=True)
     num_delay_days = models.IntegerField(blank=True, default=0)
     status= models.CharField(choices=STATUS_OPTIONS)
 

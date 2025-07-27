@@ -53,7 +53,6 @@ class UserWatchListViewSet(viewsets.ModelViewSet):
             date=date.today(),
             defaults={ 'num_watched_episodes': 0, 'minutes_watched': 0 }
         )
-        print(stat_object)
         if (eps_watched > num_eps):
             # remove ep from stats if possible
             if stat_object.num_watched_episodes > 0:

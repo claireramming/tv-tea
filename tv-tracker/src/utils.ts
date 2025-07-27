@@ -174,6 +174,33 @@ export async function finishWatchingSeason(watchlistId: number | undefined, toke
   }
 }
 
+/**
+ * Marks an unwatched season as "removed", meaning it should not be shown in the watchlist anymore
+ * @param showId id of the show
+ * @param seasonNumber id of the season
+ * @param token access token
+ */
+export async function ignoreNewSeason(showId: number | undefined, seasonNumber: number | undefined, status: string | undefined, token: string | undefined) {
+  try {
+    const removalDate = new Date().toISOString()
+    const response = await SimpleFetch.post(
+      'watchlist/',
+      { show_id: showId, season: seasonNumber, status, datetime_removed_at: removalDate },
+      token
+    );
+    toast.success('Season removed!', {
+      theme: "colored",
+    });
+    return response
+  } catch (e) {
+    console.error(e)
+    toast.error('Error ignoring season', {
+      theme: "colored",
+    });
+    return false
+  }
+}
+
 export async function updateWatchListEntry(
   watchlistId: number | undefined,
   data: Record<string, unknown>,
