@@ -14417,7 +14417,7 @@ function Mb(d) {
   ] }) }) }, d.data.id);
 }
 function jb() {
-  const d = new $T.MovieDb(""), [e, S] = h.useState(), [k, m] = h.useState(""), [b, z] = h.useState([]), c = b.map((i) => /* @__PURE__ */ R.jsx(Mb, { data: i, handleClick: U }, i.id));
+  const d = new $T.MovieDb("2a45495eb00bed3267d8daa48231f4d5"), [e, S] = h.useState(), [k, m] = h.useState(""), [b, z] = h.useState([]), c = b.map((i) => /* @__PURE__ */ R.jsx(Mb, { data: i, handleClick: U }, i.id));
   function u(i) {
     m(i.target.value), clearTimeout(e), S(setTimeout(() => void M(i.target.value), 300));
   }
@@ -14900,7 +14900,7 @@ function Jq(d) {
     return il.createElement("div", { tabIndex: -1, className: L(f), "data-stacked": S, style: tt, key: `c-${f}` }, x.map(({ content: lt, props: pt }) => il.createElement(eq, { ...pt, stacked: S, collapseAll: B, isIn: c(pt.toastId, pt.containerId), key: `t-${pt.key}` }, lt)));
   }));
 }
-const Pk = new $T.MovieDb("");
+const Pk = new $T.MovieDb("2a45495eb00bed3267d8daa48231f4d5");
 function kq(d) {
   return Pk.tvInfo({ id: d, append_to_response: "watch/providers,content_ratings" });
 }
@@ -15122,7 +15122,7 @@ class da {
    * @returns {Promise<Object>|Error}
    */
   static baseFetch = async (e, S, k = void 0, m = {}, b, z = {}, c = "application/json", u = !1, U = !1) => {
-    const M = `/${e}`, i = {
+    const M = `https://human-coralie-tvtea-6783c1aa.koyeb.app/${e}`, i = {
       method: S,
       headers: {
         Authorization: `Bearer ${k || ""}`,
@@ -15481,7 +15481,7 @@ function iq(d) {
   return h.useEffect(() => {
     if (!e?.isAuthenticated) return;
     k(!0);
-    const C = new $T.MovieDb("");
+    const C = new $T.MovieDb("2a45495eb00bed3267d8daa48231f4d5");
     async function L() {
       const B = await cq(e?.accessToken || ""), f = await Promise.all(B.map(async (x) => {
         const tt = await C.tvInfo({ id: x.show_id, append_to_response: `season/${x.season},season/${x.season}/watch/providers` }), lt = tt.seasons.find((qt) => qt.season_number === x.season).id, { [`season/${x.season}`]: pt, [`season/${x.season}/watch/providers`]: Et, ...bt } = tt;
@@ -15642,7 +15642,7 @@ function Pq() {
     ] })
   ] }) : /* @__PURE__ */ R.jsx("div", { className: "hero min-h-screen bg-base-200", children: /* @__PURE__ */ R.jsx("div", { className: "hero-content text-center", children: /* @__PURE__ */ R.jsx("div", { className: "max-w-md", children: /* @__PURE__ */ R.jsx("div", { children: "Please log in to see your stats" }) }) }) });
 }
-var fq = {};
+var fq = { AUTH0_DOMAIN: "dev-mxo5ack7pqfh6xcm.us.auth0.com" };
 function vq() {
   const { user: d, isAuthenticated: e, loginWithRedirect: S, getAccessTokenSilently: k, logout: m } = gc(), [b, z] = h.useState({}), c = async () => {
     await m({ logoutParams: { returnTo: window.location.origin } }), z({});
@@ -15692,13 +15692,13 @@ function vq() {
     /* @__PURE__ */ R.jsx(Jq, {})
   ] });
 }
-var pk = {};
+var pk = { AUTH0_CLIENT_ID: "GBh8oRP2oMxNccphRWdM2ZgRejR4RGDa", AUTH0_DOMAIN: "dev-mxo5ack7pqfh6xcm.us.auth0.com" };
 bc.createRoot(document.getElementById("root")).render(
   /* @__PURE__ */ R.jsx(h.StrictMode, { children: /* @__PURE__ */ R.jsx(
     Bc,
     {
-      domain: pk.AUTH0_DOMAIN || "",
-      clientId: pk.AUTH0_CLIENT_ID || "",
+      domain: pk.AUTH0_DOMAIN,
+      clientId: pk.AUTH0_CLIENT_ID,
       authorizationParams: {
         redirect_uri: window.location.origin,
         audience: "https://dev-mxo5ack7pqfh6xcm.us.auth0.com/api/v2/",
