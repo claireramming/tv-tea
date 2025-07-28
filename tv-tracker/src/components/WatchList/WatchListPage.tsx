@@ -56,7 +56,7 @@ export default function WatchListPage(props: { login: () => void }) {
   }
 
   async function ignoreSeason(season) {
-    const ignored = await ignoreNewSeason(season.id, season.season_number, season.status, user.accessToken);
+    const ignored = await ignoreNewSeason(season.showId, season.season_number, season.status, user.accessToken);
     if (ignored) {
       ignored.seasonId = season.id
       setSeasonArray([...seasonArray, ignored])

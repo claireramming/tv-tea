@@ -15495,7 +15495,7 @@ function Nq(d) {
     D && b(m.map((K) => (K.watchlistId === w && (K.datetime_finished_at = D, K.datetime_started_at || (K.datetime_started_at = D)), K)));
   }
   async function P(w) {
-    const D = await sq(w.id, w.season_number, w.status, e.accessToken);
+    const D = await sq(w.showId, w.season_number, w.status, e.accessToken);
     D && (D.seasonId = w.id, b([...m, D]));
   }
   async function g(w, D, K) {
