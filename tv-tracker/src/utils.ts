@@ -78,6 +78,19 @@ export async function createUserProfile(user: string, token: string) {
   }
 }
 
+export async function updateUserProfile(user: string, profile: ProfileInfo, token: string) {
+  if (!user || !profile) return;
+  try {
+    await SimpleFetch.patch(`profile/${getUserId(user)}/`, profile, token);
+  } catch (e) {
+    console.error(e);
+    toast.error('Error updating user profile', {
+        autoClose: 3000,
+        theme: "colored",
+      });
+  }
+}
+
 async function getSeasonFromUserWatchlist(
   showId: number,
   seasonNumber: number,

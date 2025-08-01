@@ -13,6 +13,7 @@ STATUS_OPTIONS = (
 
 class UserProfile(models.Model):
     id = models.CharField(primary_key=True)
+    name = models.CharField(max_length=100, blank=True, default="")
     country = models.CharField(max_length=2, blank=True, default="US")
     preferred_providers = ArrayField(models.IntegerField(), blank=True, default=list)
 

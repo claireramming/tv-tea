@@ -30,6 +30,7 @@ export type Rating = {
 
 export type ProfileInfo = {
   id: string;
+  name: string;
   country: string;
   providers: string[];
 }
