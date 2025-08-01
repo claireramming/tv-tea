@@ -14,7 +14,7 @@ export default function WatchList(props: {
 
   let tabContent: SeasonToWatch[] = [];
   if (tabIndex === 0) {
-    tabContent = props.watchlist.filter((season) => !season.datetime_started_at);
+    tabContent = props.watchlist.filter((season) => !season.datetime_started_at && !season.datetime_removed_at);
   } else if (tabIndex === 1) {
     tabContent = props.watchlist.filter((season) => season.datetime_started_at && !season.datetime_finished_at);
   } else if (tabIndex === 2) {

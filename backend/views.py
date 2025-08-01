@@ -12,7 +12,9 @@ class UserWatchListViewSet(viewsets.ModelViewSet):
     queryset = UserWatchList.objects.all()
     serializer_class = UserWatchListSerializer
     filterset_fields = {
-        'datetime_finished_at': ['gte']
+        'datetime_finished_at': ['gte'],
+        'season': ['exact'],
+        'show_id': ['exact'],
     }
     
     def get_queryset(self):

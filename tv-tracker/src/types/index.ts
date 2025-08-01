@@ -43,6 +43,7 @@ export type WatchListEntry = {
   datetime_added_at: string,
   datetime_started_at?: string,
   datetime_finished_at?: string,
+  datetime_removed_at?: string,
   num_delay_days?: number,
   status: string
 }

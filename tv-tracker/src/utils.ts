@@ -78,6 +78,20 @@ export async function createUserProfile(user: string, token: string) {
   }
 }
 
+async function getSeasonFromUserWatchlist(
+  showId: number,
+  seasonNumber: number,
+  token: string
+): Promise<WatchListEntry | null> {
+  try {
+    const seasonsResponse = await SimpleFetch.get('watchlist/', {show_id: showId, season: seasonNumber}, token);
+    return seasonsResponse?.[0];
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
 export async function addSeasonToWatchList(
   showId: number,
   seasonNumber: number,
@@ -85,11 +99,23 @@ export async function addSeasonToWatchList(
   token: string
 ): Promise<boolean> {
   try {
-    await SimpleFetch.post(
-      'watchlist/',
-      { show_id: showId, season: seasonNumber, status: showStatus },
-      token
-    );
+    const season = await getSeasonFromUserWatchlist(showId, seasonNumber, token)
+    if (season && season.datetime_removed_at) {
+      await SimpleFetch.patch(`watchlist/${season.id}/`, { datetime_removed_at: null }, token);
+
+    } else if (season && !season.datetime_removed_at) {
+      toast.info('Season already in watchlist', {
+        autoClose: 3000,
+        theme: "colored",
+      });
+      return false
+    } else {
+      await SimpleFetch.post(
+        'watchlist/',
+        { show_id: showId, season: seasonNumber, status: showStatus },
+        token
+      );
+    }
     toast.success('Added season to watchlist!', {
       autoClose: 3000,
       theme: "colored",
