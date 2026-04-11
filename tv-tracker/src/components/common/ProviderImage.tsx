@@ -1,18 +1,18 @@
 import { WatchProvider } from "../../types";
 import { imageBaseUrl } from "../../constants";
 
-export default function ProviderImage(props: { count: number, providers: WatchProvider[] }) {
+export default function ProviderImage(props: { count: number, providers: WatchProvider[] | undefined }) {
   const providerOptions =
       props.providers
-        ?.filter((p: WatchProvider) => p.display_priority < 50)
+        ?.filter((p: WatchProvider) => (p.display_priority ?? 100) < 50 && p.logo_path)
         ?.slice(0, props.count) || [];
     const providersList = providerOptions.map((provider: WatchProvider) => {
       return (
         <img
-          key={provider.provider_id}
+          key={provider.provider_id ?? provider.provider_name}
           src={imageBaseUrl + 'w92' + provider.logo_path}
           className="rounded-xl"
-          alt={provider.provider_name}
+          alt={provider.provider_name ?? 'provider name missing'}
         />
       );
     });

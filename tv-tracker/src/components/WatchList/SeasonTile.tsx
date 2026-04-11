@@ -24,7 +24,7 @@ export default function SeasonTile(props: {
 
   const providers = (props.season?.providers) ? props.season.providers?.US?.flatrate : [];
   const actionButton = !props.season.datetime_started_at ? 
-    <button className="bg-accent! btn" onClick={()=>document.getElementById(`add_season_${props.season.watchlistId}`).showModal()}>Start Watching</button>
+    <button className="bg-accent! btn" onClick={() => (document.getElementById(`add_season_${props.season.watchlistId}`) as HTMLDialogElement)?.showModal()}>Start Watching</button>
     : !props.season.datetime_finished_at ? 
     <button className="bg-accent! btn" onClick={() => void props.finish(props.season.watchlistId)}>Finish Watching</button>
     : (<></>)

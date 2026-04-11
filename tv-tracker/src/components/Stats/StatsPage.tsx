@@ -2,19 +2,13 @@ import { useContext, useEffect, useState } from 'react';
 import { UserContext, User } from '../../contexts/UserContext';
 import Loading from '../common/Loading';
 import { getSeasonsFinishedSince, getUserStats } from '../../utils';
-
-type StatsInfo = {
-  date: string;
-  num_watched_episodes: number;
-  minutes_watched: number;
-  id: string;
-}
+import { StatsInfo } from '../../types';
 
 export default function StatsPage() {
   const user: User = useContext(UserContext);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [stats, setStats] = useState<StatsInfo[]>([]);
-  const [aggregation, setAggregation] = useState<string>('week');
+  const [aggregation, setAggregation] = useState<'week' | 'month' | 'year' | 'all'>('week');
   const [totalEpisodes, setTotalEpisodes] = useState<number>(0);
   const [totalMinutes, setTotalMinutes] = useState<number>(0);
   const [totalSeasons, setTotalSeasons] = useState<number>(0);

@@ -1,14 +1,14 @@
 import { Episode } from "moviedb-promise";
-import { SeasonToWatch } from "../../types";
+import { NextSeason, SeasonToWatch, UpNextEpisode } from "../../types";
 import ProviderImage from "../common/ProviderImage";
 import  defaultImage from '../../assets/tv-screen.jpg';
 
-export default function UpNext(props: { 
-  isLoading: boolean, 
-  watchlist: SeasonToWatch[], 
-  add: (showId: number, id: number) => void, 
-  start: (id: number) => void, 
-  ignore: (id: number) => void,
+export default function UpNext(props: {
+  isLoading: boolean,
+  watchlist: SeasonToWatch[],
+  add: (showId: number, seasonNumber: number | undefined, status: string) => void,
+  start: (id: number) => void,
+  ignore: (season: NextSeason) => void,
   update: (id: number, episodes: number, watchtime: number) => void
 }) {
 
@@ -17,8 +17,8 @@ export default function UpNext(props: {
   const completed = props.watchlist.filter((season: SeasonToWatch) => season.datetime_finished_at);
   const today: string = new Date().toLocaleDateString('en-CA');
 
-  const inProgressEps = inProgress.reduce((acc: SeasonToWatch[], season: SeasonToWatch) => {
-    if (season.num_episodes_watched < (season.episodes.length || 0)) {
+  const inProgressEps = inProgress.reduce((acc: UpNextEpisode[], season: SeasonToWatch) => {
+    if (season.num_episodes_watched < (season.episodes?.length || 0)) {
       const nextEpisode: Episode = season.episodes[season.num_episodes_watched];
       if (!nextEpisode?.air_date) return acc;
       if (nextEpisode.air_date < today) {
@@ -34,16 +34,16 @@ export default function UpNext(props: {
     return acc;
   }, [])
 
-  const shows = completed.reduce((acc: unknown, season: SeasonToWatch) => {
+  const shows = completed.reduce((acc: Record<number, SeasonToWatch>, season: SeasonToWatch) => {
     const showId = season?.show?.id;
     const seasonNumber = season.season_number;
-    if (!acc?.[showId] || acc[showId].season < seasonNumber) {
+    if (showId && (!acc[showId] || acc[showId].season < seasonNumber)) {
       acc[showId] = season;
-    } 
-    return acc
+    }
+    return acc;
   }, {})
 
-  const nextSeasons = Object.values(shows).reduce((acc: SeasonToWatch[], season: SeasonToWatch) => {
+  const nextSeasons = Object.values(shows).reduce((acc: NextSeason[], season: SeasonToWatch) => {
     const hasNextSeason = season.show.number_of_seasons > season.season_number;
     if (hasNextSeason) {
       const currentSeasonIndex = season.show.seasons.findIndex((s: {season_number: number}) => s.season_number === season.season_number);
@@ -54,8 +54,8 @@ export default function UpNext(props: {
       const removedFromList = props.watchlist.find((s: SeasonToWatch) => s.seasonId === nextSeasonId && s.datetime_removed_at);
       if (alreadyAdded || alreadyStarted || removedFromList) return acc;
       const nextSeasonAirDate = nextSeason?.air_date;
-      if (nextSeasonAirDate && nextSeasonAirDate < today) {
-        acc.push({...nextSeason, showName: season.show.name, showId: season.show.id, status: season.status});
+      if (nextSeasonAirDate && nextSeasonAirDate < today && season.show?.name && season.show?.id) {
+        acc.push({ ...nextSeason, showName: season.show.name, showId: season.show.id, status: season.status });
       }
     }
     return acc

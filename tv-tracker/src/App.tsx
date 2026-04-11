@@ -56,7 +56,7 @@ function App() {
           }
         });
   
-        const user_metadata: User = await metadataResponse.json();
+        const user_metadata = await metadataResponse.json() as User;
         setUserMetadata({ ...user, isAuthenticated, ...user_metadata, accessToken });
         getOrCreateUserProfile(user.sub, accessToken);
       } catch (e) {

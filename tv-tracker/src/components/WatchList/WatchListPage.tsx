@@ -11,10 +11,10 @@ import {
   addSeasonToWatchList,
   ignoreNewSeason,
 } from '../../utils';
-import { MovieDb, SimpleSeason } from 'moviedb-promise';
+import { MovieDb, SimpleSeason, TvSeasonResponse, WatchProviderResponse } from 'moviedb-promise';
 import UpNext from './UpNext';
 import WatchList from './WatchList';
-import { SeasonToWatch, WatchListEntry } from '../../types';
+import { NextSeason, SeasonToWatch, WatchListEntry } from '../../types';
 
 export default function WatchListPage(props: { login: () => void }) {
   const user: User = useContext(UserContext);
@@ -57,12 +57,12 @@ export default function WatchListPage(props: { login: () => void }) {
     }));
   }
 
-  async function ignoreSeason(season) {
+  async function ignoreSeason(season: NextSeason) {
     const ignored = await ignoreNewSeason(season.showId, season.season_number, season.status, user.accessToken);
     if (ignored) {
-      ignored.seasonId = season.id
-      setSeasonArray([...seasonArray, ignored])
-    };
+      ignored.seasonId = season.id;
+      setSeasonArray([...seasonArray, ignored]);
+    }
   }
 
   async function watchEpisode(id:number, watchedEps: number, watchtime: number) {
@@ -88,10 +88,12 @@ export default function WatchListPage(props: { login: () => void }) {
       const watchList = await getUserWatchList(user?.accessToken || '');
       const seasonArray: SeasonToWatch[] = await Promise.all(watchList.map(async (season: WatchListEntry) => {
         const showInfo = await moviedb.tvInfo({ id: season.show_id, append_to_response: `season/${season.season},season/${season.season}/watch/providers` });
-        const seasonId = showInfo.seasons.find((s: {season_number: number}) => s.season_number === season.season).id;
-        const { [`season/${season.season}`]: seasonInfo, [`season/${season.season}/watch/providers`]: providers, ...restShow } = showInfo;
-        const seasonObject = {...season, seasonId, providers: providers?.results, ...seasonInfo, show: restShow, watchlistId: season.id };
-        return seasonObject
+        const seasonId = showInfo.seasons?.find((s) => s.season_number === season.season)?.id;
+        const { [`season/${season.season}`]: rawSeasonInfo, [`season/${season.season}/watch/providers`]: rawProviders, ...restShow } = showInfo;
+        const seasonInfo = rawSeasonInfo as TvSeasonResponse | undefined;
+        const providers = (rawProviders as WatchProviderResponse | undefined)?.results;
+        const seasonObject: SeasonToWatch = { ...season, seasonId, providers, ...(seasonInfo || {}), show: restShow, watchlistId: season.id };
+        return seasonObject;
       }));
       setSeasonArray(seasonArray);
     }

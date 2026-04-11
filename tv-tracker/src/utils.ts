@@ -1,8 +1,14 @@
-import { ProfileInfo, WatchListEntry } from "./types";
+import { ProfileInfo, StatsInfo, WatchListEntry } from "./types";
 import { MovieDb, SimpleSeason, TvSeasonResponse } from "moviedb-promise";
 import { toast } from 'react-toastify';
 
 const moviedb = new MovieDb(process.env.TMDB_API_KEY || '');
+
+class ApiError extends Error {
+  constructor(message: string, public body: unknown) {
+    super(message);
+  }
+}
 
 export function fetchShowData(id: string | number) {
   return moviedb.tvInfo({ id, append_to_response: 'watch/providers,content_ratings' });
@@ -25,7 +31,7 @@ export function fetchSeasonData(
  */
 export async function getUserProfile(user: string, token: string): Promise<ProfileInfo> {
   try {
-    return await SimpleFetch.get(`profile/${getUserId(user)}/`, {}, token);
+    return await SimpleFetch.get<ProfileInfo>(`profile/${getUserId(user)}/`, {}, token);
   } catch (e) {
     console.error(e);
     return null
@@ -39,25 +45,25 @@ export async function getUserProfile(user: string, token: string): Promise<Profi
  */
 export async function getUserWatchList(token: string): Promise<WatchListEntry[] | []> {
   try {
-    return await SimpleFetch.get('watchlist/', {}, token);
+    return await SimpleFetch.get<WatchListEntry[]>('watchlist/', {}, token);
   } catch (e) {
     console.error(e)
   }
   return [];
 }
 
-export async function getUserStats(token: string): Promise<StatsInfo> {
+export async function getUserStats(token: string): Promise<StatsInfo[]> {
   try {
-    return await SimpleFetch.get('watchstats/', {}, token);
+    return await SimpleFetch.get<StatsInfo[]>('watchstats/', {}, token);
   } catch (e) {
     console.error(e);
     return null
   }
 }
 
-export async function getSeasonsFinishedSince(startDate: Date, token: string): Promise<WatchListEntry[] | []> {
+export async function getSeasonsFinishedSince(startDate: string, token: string): Promise<WatchListEntry[]> {
   try {
-    return await SimpleFetch.get('watchlist/', { datetime_finished_at__gte: startDate }, token);
+    return await SimpleFetch.get<WatchListEntry[]>('watchlist/', { datetime_finished_at__gte: startDate }, token);
   } catch (e) {
     console.error(e)
   }
@@ -81,7 +87,7 @@ export async function createUserProfile(user: string, token: string) {
 export async function updateUserProfile(user: string, profile: ProfileInfo, token: string) {
   if (!user || !profile) return;
   try {
-    return await SimpleFetch.patch(`profile/${getUserId(user)}/`, profile, token);
+    return await SimpleFetch.patch<ProfileInfo>(`profile/${getUserId(user)}/`, profile, token);
   } catch (e) {
     console.error(e);
     toast.error('Error updating user profile', {
@@ -97,7 +103,7 @@ async function getSeasonFromUserWatchlist(
   token: string
 ): Promise<WatchListEntry | null> {
   try {
-    const seasonsResponse = await SimpleFetch.get('watchlist/', {show_id: showId, season: seasonNumber}, token);
+    const seasonsResponse = await SimpleFetch.get<WatchListEntry[]>('watchlist/', {show_id: showId, season: seasonNumber}, token);
     return seasonsResponse?.[0];
   } catch (e) {
     console.error(e);
@@ -135,20 +141,22 @@ export async function addSeasonToWatchList(
     });
     return true
   } catch (e) {
-    const error = await e.json()
-    if (error?.non_field_errors && error.non_field_errors?.[0].includes('unique set')) {
-      toast.info('Season already in watchlist', {
-        autoClose: 3000,
-        theme: "colored",
-      });
-    } else {
-      console.error(e)
-      toast.error('Error adding season to watchlist', {
-        autoClose: 3000,
-        theme: "colored",
-      });
+    if (e instanceof ApiError) {
+      const body = e.body as { non_field_errors?: string[] };
+      if (body?.non_field_errors?.[0]?.includes('unique set')) {
+        toast.info('Season already in watchlist', {
+          autoClose: 3000,
+          theme: "colored",
+        });
+        return false;
+      }
     }
-    return false
+    console.error(e);
+    toast.error('Error adding season to watchlist', {
+      autoClose: 3000,
+      theme: "colored",
+    });
+    return false;
   }
 }
 
@@ -222,7 +230,7 @@ export async function finishWatchingSeason(watchlistId: number | undefined, toke
 export async function ignoreNewSeason(showId: number | undefined, seasonNumber: number | undefined, status: string | undefined, token: string | undefined) {
   try {
     const removalDate = new Date().toISOString()
-    const response = await SimpleFetch.post(
+    const response = await SimpleFetch.post<WatchListEntry>(
       'watchlist/',
       { show_id: showId, season: seasonNumber, status, datetime_removed_at: removalDate },
       token
@@ -291,15 +299,15 @@ export class SimpleFetch {
    * @param {boolean} responseNotJson If the response should not be parsed as JSON
    * @returns {Promise<Object>}
    */
-  static post = async (
+  static post = async <T = unknown>(
     endPoint: string,
     body: Record<string, unknown>,
     token: string | undefined = undefined,
     additionalHeaders = {},
     otherOptions = {},
     responseNotJson = false
-  ) => {
-    return await this.baseFetch(
+  ): Promise<T> => {
+    return await this.baseFetch<T>(
       endPoint,
       'POST',
       token,
@@ -320,14 +328,14 @@ export class SimpleFetch {
    * @param {Object} otherOptions - will be appended to options object
    * @returns {Promise<Object>}
    */
-  static put = async (
+  static put = async <T = unknown>(
     endPoint: string,
     body: Record<string, unknown>,
     token: string | undefined = undefined,
     additionalHeaders = {},
     otherOptions = {}
-  ) => {
-    return await this.baseFetch(endPoint, 'PUT', token, additionalHeaders, body, otherOptions);
+  ): Promise<T> => {
+    return await this.baseFetch<T>(endPoint, 'PUT', token, additionalHeaders, body, otherOptions);
   };
 
   /**
@@ -340,7 +348,7 @@ export class SimpleFetch {
    * @param {String} contentType If not application/json
    * @returns {Promise<Object>}
    */
-  static get = async (
+  static get = async <T = unknown>(
     endPoint: string,
     params = {},
     token: string | undefined = undefined,
@@ -348,8 +356,8 @@ export class SimpleFetch {
     otherOptions = {},
     contentType = 'application/json',
     responseNotJson = false
-  ) => {
-    return await this.baseFetch(
+  ): Promise<T> => {
+    return await this.baseFetch<T>(
       `${endPoint}${toQueryParams(params)}`,
       'GET',
       token,
@@ -362,13 +370,13 @@ export class SimpleFetch {
   };
 
   /** DELETE method */
-  static delete = async (
+  static delete = async <T = unknown>(
     endPoint: string,
     token: string | undefined = undefined,
     additionalHeaders = {},
     otherOptions = {}
-  ) => {
-    return await this.baseFetch(
+  ): Promise<T> => {
+    return await this.baseFetch<T>(
       endPoint,
       'DELETE',
       token,
@@ -387,14 +395,14 @@ export class SimpleFetch {
    * @param {Object} otherOptions - will be appended to options object
    * @returns {Promise<Object>}
    */
-  static patch = async (
+  static patch = async <T = unknown>(
     endPoint: string,
     body: Record<string, unknown>,
     token: string | undefined = undefined,
     additionalHeaders = {},
     otherOptions = {}
-  ) => {
-    return await this.baseFetch(endPoint, 'PATCH', token, additionalHeaders, body, otherOptions);
+  ): Promise<T> => {
+    return await this.baseFetch<T>(endPoint, 'PATCH', token, additionalHeaders, body, otherOptions);
   };
 
   /**
@@ -431,7 +439,7 @@ export class SimpleFetch {
    * @param {boolean} responseNotJson If the response should not be parsed as JSON
    * @returns {Promise<Object>|Error}
    */
-  static baseFetch = async (
+  static baseFetch = async <T = unknown>(
     endPoint: string,
     method: string,
     token: string | undefined = undefined,
@@ -441,7 +449,7 @@ export class SimpleFetch {
     contentType = 'application/json',
     responseNotJson = false,
     formDataRequest = false
-  ): Promise<unknown> => {
+  ): Promise<T> => {
     const url = `${process.env.API_URL}/${endPoint}`;
     //await refreshTokensIfNeeded();
     const options = {
@@ -458,7 +466,8 @@ export class SimpleFetch {
 
     const response = await fetch(url, options);
     if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}`);
+      const body = await (response.json() as Promise<unknown>).catch(() => null);
+      throw new ApiError(`HTTP error ${response.status}`, body);
     }
 
     if (
@@ -469,7 +478,7 @@ export class SimpleFetch {
     ) {
       return response;
     }
-    const json = await response.json();
+    const json = await response.json() as T;
     return json;
   };
 }

@@ -1,4 +1,6 @@
-import { ShowResponse, SimpleEpisode } from "moviedb-promise";
+import { Episode, ShowResponse, SimpleEpisode, SimpleSeason, WatchProvider, WatchProviderCountry } from "moviedb-promise";
+
+export type { WatchProvider };
 
 export type FullSeason = {
   air_date?: string;
@@ -9,18 +11,29 @@ export type FullSeason = {
   poster_path?: string;
   season_number: number;
   episodes: SimpleEpisode[];
-  providers?: {US: { flatrate: WatchProvider[] } };
+  providers?: Record<string, WatchProviderCountry>;
   show?: ShowResponse;
   watchlistId?: number;
+  episodesReady?: number;
+  showName?: string;
+  showId?: number;
+  seasonId?: number;
 }
 
 export type SeasonToWatch = FullSeason & WatchListEntry
 
-export type WatchProvider = {
-  display_priority: number;
-  logo_path: string;
-  provider_id: number;
-  provider_name: string;
+export type UpNextEpisode = {
+  watchlistId: number;
+  showName: string;
+  seasonName: string | undefined;
+  episode: Episode;
+  providers: WatchProvider[];
+}
+
+export type NextSeason = SimpleSeason & {
+  showName: string;
+  showId: number;
+  status: string;
 }
 
 export type Rating = {
@@ -33,6 +46,13 @@ export type ProfileInfo = {
   name: string;
   country: string;
   providers: string[];
+}
+
+export type StatsInfo = {
+  id: string;
+  date: string;
+  num_watched_episodes: number;
+  minutes_watched: number;
 }
 
 export type WatchListEntry = {
