@@ -11,5 +11,6 @@ router.register(r"watchstats", views.UserWatchStatsViewSet, basename="watchstats
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('health/', views.health_check),
     path('', include(router.urls)),
 ]
