@@ -50,3 +50,6 @@ db.sqlite3
 staticfiles/
 debug.env
 .vscode/settings.json
+
+# Frontend build output
+tv-tracker/dist/

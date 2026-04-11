@@ -17,17 +17,6 @@ export default defineConfig({
   build: {
     target: ['esnext'],
     outDir: path.resolve(__dirname, './dist/'),
-
-    lib: {
-      entry: path.resolve(__dirname, 'src/main.tsx'),
-      formats: ['es'],
-      name: 'tv-tracker'
-    },
-    rollupOptions: {
-      output: {
-        entryFileNames: 'tv-tracker.es.js'
-      }
-    },
     sourcemap: true
   },
   plugins: [
