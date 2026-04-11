@@ -15,8 +15,7 @@ export default function Profile() {
     "countryCode",
     "[{countryCode}] {countryNameEn}"
   );
-
-  const countryCodesList = Object.entries(myCountryCodesObject).map(([code, name]) => (<option selected={code === userCountry} key={code} value={code}>{name}</option>));
+  const countryCodesList = Object.entries(myCountryCodesObject).map(([code, name]) => (<option key={code} value={code}>{name}</option>));
 
   function toggleEdit() {
     setEditing(!editing);
@@ -32,11 +31,13 @@ export default function Profile() {
     const profileResponse: ProfileInfo | null = await updateUserProfile(user.sub, updatedProfile, user.accessToken);
     if (profileResponse) {
       setProfile(profileResponse);
+      setUserName(profileResponse?.name || '');
+      setUserCountry(profileResponse?.country || '');
     } else {
       setUserName(profile?.name || '');
       setUserCountry(profile?.country || '');
     }
-    setEditing(false);
+      setEditing(false);
   }
 
   function cancelEditing() {
@@ -47,7 +48,11 @@ export default function Profile() {
 
   useEffect(() => {
   if (user?.isAuthenticated) {
-    void getUserProfile(user?.sub || '', user?.accessToken || '').then(data => setProfile(data))
+    void getUserProfile(user?.sub || '', user?.accessToken || '').then(data => {
+      setProfile(data);
+      setUserName(data?.name || '');
+      setUserCountry(data?.country || '');
+    });
   }
 }, [user]);
 
@@ -90,8 +95,8 @@ export default function Profile() {
             onChange={(e) => setUserName(e.target.value)} 
             className="input input-bordered w-full max-w-xs mb-4"
           />
-          <select defaultValue="Pick a country code" className="select" onChange={(e) => setUserCountry(e.target.value)}>
-            <option disabled={true}>Pick a country code</option>
+          <select value={userCountry} className="select" onChange={(e) => setUserCountry(e.target.value)}>
+            <option disabled={true} value=''>Pick a country code</option>
             {countryCodesList}
           </select>
           <button className="btn btn-primary mr-2" onClick={saveProfile}>Save</button>

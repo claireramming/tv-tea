@@ -16,7 +16,6 @@ import { SeasonToWatch, WatchListEntry } from '../../types';
 
 export default function WatchListPage(props: { login: () => void }) {
   const user: User = useContext(UserContext);
-  
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [seasonArray, setSeasonArray] = useState<SeasonToWatch[]>([]);
   const [addedSeasons, setAddedSeasons] = useState<SimpleSeason[]>([]);
@@ -74,8 +73,11 @@ export default function WatchListPage(props: { login: () => void }) {
   }
 
   useEffect(() => {
-    if (!user?.isAuthenticated) return
     setIsLoading(true);
+    if (!user?.isAuthenticated) {
+      setIsLoading(false);
+      return;
+    }
 
     const moviedb = new MovieDb(process.env.TMDB_API_KEY || '');
 
