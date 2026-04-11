@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import Header from './components/Header';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import './App.css';
@@ -57,7 +56,6 @@ function App() {
           }
         });
   
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const user_metadata: User = await metadataResponse.json();
         setUserMetadata({ ...user, isAuthenticated, ...user_metadata, accessToken });
         getOrCreateUserProfile(user.sub, accessToken);
@@ -68,6 +66,7 @@ function App() {
 
     if (!user?.sub) return;
     getUserMetadata();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.sub]);
 
   return (

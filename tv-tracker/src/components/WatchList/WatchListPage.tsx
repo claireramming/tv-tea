@@ -1,5 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import { UserContext, User } from '../../contexts/UserContext';
+import Loading from '../common/Loading';
 import { 
   getUserWatchList,
   removeSeasonFromWatchList,
@@ -16,6 +18,7 @@ import { SeasonToWatch, WatchListEntry } from '../../types';
 
 export default function WatchListPage(props: { login: () => void }) {
   const user: User = useContext(UserContext);
+  const { isLoading: isAuthLoading, isAuthenticated } = useAuth0();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [seasonArray, setSeasonArray] = useState<SeasonToWatch[]>([]);
   const [addedSeasons, setAddedSeasons] = useState<SimpleSeason[]>([]);
@@ -98,6 +101,14 @@ export default function WatchListPage(props: { login: () => void }) {
 
   
    
+  if (isAuthLoading || (isAuthenticated && !user?.isAuthenticated)) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loading />
+      </div>
+    );
+  }
+
   if (user?.isAuthenticated) {
     return (
       <>

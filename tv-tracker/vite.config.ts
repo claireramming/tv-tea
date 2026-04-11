@@ -25,6 +25,8 @@ export default defineConfig({
     EnvironmentPlugin({
       TMDB_API_KEY: '',
       API_URL: '',
+      AUTH0_DOMAIN: '',
+      AUTH0_CLIENT_ID: '',
     })
   ],
   server: {

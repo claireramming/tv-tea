@@ -458,7 +458,7 @@ export class SimpleFetch {
 
     const response = await fetch(url, options);
     if (!response.ok) {
-      throw response;
+      throw new Error(`HTTP error ${response.status}`);
     }
 
     if (
