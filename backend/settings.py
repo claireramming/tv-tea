@@ -17,6 +17,11 @@ from dotenv import load_dotenv, find_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables before anything else so DATABASE_URL etc. are available
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
 TEMPLATE_DIR = os.path.join(BASE_DIR, "backend", "templates")
 
 # Quick-start development settings - unsuitable for production
@@ -127,11 +132,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Load environment definition file
-ENV_FILE = find_dotenv()
-if ENV_FILE:
-    load_dotenv(ENV_FILE)
 
 # Load Auth0 application settings into memory
 AUTH0_DOMAIN = os.environ.get("AUTH0_DOMAIN")
