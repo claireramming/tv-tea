@@ -16,6 +16,7 @@ class UserProfile(models.Model):
     name = models.CharField(max_length=100, blank=True, default="")
     country = models.CharField(max_length=2, blank=True, default="US")
     preferred_providers = ArrayField(models.IntegerField(), blank=True, default=list)
+    ignored_providers = ArrayField(models.IntegerField(), blank=True, default=list)
 
 class UserWatchList(models.Model):
     class Meta:

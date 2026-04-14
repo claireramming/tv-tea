@@ -9,8 +9,8 @@ export default function Header(props: { logout: () => void, login: () => void })
 
   const availableOptions = user?.isAuthenticated ? (
     <>
-      <li><a href='profile'>Profile</a></li>
-      <li><a href='stats'>Stats</a></li>
+      <li><a href='/profile'>Profile</a></li>
+      <li><a href='/stats'>Stats</a></li>
     </>
   ) : (<></>);
 
@@ -47,7 +47,7 @@ export default function Header(props: { logout: () => void, login: () => void })
           >
             {availableOptions}
             <li>
-              <a href='faq'>FAQs and Credits</a>
+              <a href='/faq'>FAQs and Credits</a>
             </li>
             <li>
               <a onClick={user?.isAuthenticated ? props.logout : props.login}>Log {user?.isAuthenticated ? 'out' : 'in'}</a>

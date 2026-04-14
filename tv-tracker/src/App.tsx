@@ -9,6 +9,8 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { UserContext, User } from './contexts/UserContext';
 import { getUserProfile, createUserProfile } from './utils';
 import Profile from './components/Profile/Profile';
+import { ProfileContext } from './contexts/ProfileContext';
+import { ProfileInfo } from './types';
 import { ToastContainer } from 'react-toastify';
 import FAQ from './components/FAQ';
 import StatsPage from './components/Stats/StatsPage';
@@ -18,6 +20,7 @@ function App() {
     useAuth0();
 
   const [userMetadata, setUserMetadata] = useState({} as User);
+  const [profileMetadata, setProfileMetadata] = useState<ProfileInfo | null>(null);
 
   const logoutOfApp = async () => {
     await logout({ logoutParams: { returnTo: window.location.origin } });
@@ -27,12 +30,14 @@ function App() {
   async function getOrCreateUserProfile(id: string, token: string) {
     if (!id || !token) return;
     // try to pull user profile
-    const profile = await getUserProfile(id, token);
+    let profile = await getUserProfile(id, token);
 
-    // if !user profile, create one
+    // if !user profile, create one then fetch it
     if (!profile) {
       await createUserProfile(id, token);
+      profile = await getUserProfile(id, token);
     }
+    setProfileMetadata(profile);
   }
 
   useEffect(() => {
@@ -73,19 +78,19 @@ function App() {
     <>
       <BrowserRouter>
         <UserContext.Provider value={userMetadata}>
-          <Header logout={logoutOfApp} login={() => loginWithRedirect()} />
-          <Routes>
-            <Route
-              path="/"
-              element={<WatchListPage login={() => loginWithRedirect()} />}
-            />
-            <Route path="show">
-              <Route path=":id" element={<ShowPage />} />
-            </Route>
-            <Route path="profile" element={<Profile />}/>
-            <Route path="faq" element={<FAQ />} />
-            <Route path="stats" element={<StatsPage />} />
-          </Routes>
+          <ProfileContext.Provider value={profileMetadata}>
+            <Header logout={logoutOfApp} login={() => loginWithRedirect()} />
+            <Routes>
+              <Route
+                path="/"
+                element={<WatchListPage login={() => loginWithRedirect()} />}
+              />
+              <Route path="show/:id" element={<ShowPage />} />
+              <Route path="profile" element={<Profile setProfile={setProfileMetadata} />}/>
+              <Route path="faq" element={<FAQ />} />
+              <Route path="stats" element={<StatsPage />} />
+            </Routes>
+          </ProfileContext.Provider>
         </UserContext.Provider>
       </BrowserRouter>
       <ToastContainer />

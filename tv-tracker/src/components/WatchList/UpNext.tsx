@@ -1,7 +1,10 @@
+import { useContext } from "react";
 import { Episode } from "moviedb-promise";
 import { NextSeason, SeasonToWatch, UpNextEpisode } from "../../types";
 import ProviderImage from "../common/ProviderImage";
-import  defaultImage from '../../assets/tv-screen.jpg';
+import defaultImage from '../../assets/tv-screen.jpg';
+import { ProfileContext } from "../../contexts/ProfileContext";
+import { getProvidersByPriority } from "../../utils";
 
 export default function UpNext(props: {
   isLoading: boolean,
@@ -11,6 +14,11 @@ export default function UpNext(props: {
   ignore: (season: NextSeason) => void,
   update: (id: number, episodes: number, watchtime: number) => void
 }) {
+
+  const profile = useContext(ProfileContext);
+  const country = profile?.country ?? 'US';
+  const preferredIds = profile?.preferred_providers ?? [];
+  const ignoredIds = profile?.ignored_providers ?? [];
 
   const notStarted = props.watchlist.filter((season: SeasonToWatch) => !season.datetime_started_at && !season.datetime_removed_at);
   const inProgress = props.watchlist.filter((season: SeasonToWatch) => season.datetime_started_at && !season.datetime_finished_at && !season.datetime_removed_at);
@@ -30,7 +38,7 @@ export default function UpNext(props: {
           showName: season?.show?.name || '',
           seasonName: season.name,
           episode: nextEpisode,
-          providers: season.providers?.US?.flatrate || [],
+          providers: getProvidersByPriority(season.providers?.[country], preferredIds, ignoredIds),
           episodesReady,
         });
       }
@@ -137,7 +145,7 @@ return (
             <div className="badge badge-secondary">{season.episodesReady} Ready</div>
             <p className='max-h-16 overflow-y-auto'>{season?.overview || ''}</p>
             <div className="card-actions justify-between">
-              <ProviderImage count={1} providers={season.providers?.US?.flatrate || []} />
+              <ProviderImage count={1} providers={getProvidersByPriority(season.providers?.[country], preferredIds, ignoredIds)} />
               <button className="btn btn-primary mt-auto" onClick={() => props.start(season.id)}>Start Watching</button>
             </div>
           </div>

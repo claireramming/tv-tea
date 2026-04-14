@@ -54,7 +54,8 @@ export const mockProfile: ProfileInfo = {
   id: 'auth0|testuser123',
   name: 'Test User',
   country: 'US',
-  providers: ['Netflix'],
+  preferred_providers: [8],
+  ignored_providers: [],
 };
 
 export function makeFullSeason(overrides: Partial<FullSeason> = {}): FullSeason {

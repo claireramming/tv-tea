@@ -1,9 +1,12 @@
+import { useContext } from "react";
 import { Link } from "react-router";
 import { SeasonToWatch } from "../../types";
 import ProgressBar from "../common/ProgressBar";
 import ProviderImage from "../common/ProviderImage";
 import defaultImage from '../../assets/tv-screen.jpg';
 import AddSeasonModal from "./AddSeasonModal";
+import { ProfileContext } from "../../contexts/ProfileContext";
+import { getProvidersByPriority } from "../../utils";
 
 export default function SeasonTile(props: {
   season: SeasonToWatch,
@@ -13,9 +16,17 @@ export default function SeasonTile(props: {
   update: (id: number|undefined, episodes: number|undefined, watchtime: number) => void,
 }) {
 
+  const profile = useContext(ProfileContext);
+  const country = profile?.country ?? 'US';
+  const providers = getProvidersByPriority(
+    props.season.providers?.[country],
+    profile?.preferred_providers ?? [],
+    profile?.ignored_providers ?? []
+  );
+
   const episodesWatched = props.season.num_episodes_watched;
 
-  const progress = (props.season.datetime_started_at && !props.season.datetime_finished_at) ? (
+  const progress =(props.season.datetime_started_at && !props.season.datetime_finished_at) ? (
     <ProgressBar 
       watchlistId={props.season.watchlistId}
       episodesWatched={episodesWatched} 
@@ -23,8 +34,7 @@ export default function SeasonTile(props: {
       update={props.update} />
     ) : (<></>)
 
-  const providers = (props.season?.providers) ? props.season.providers?.US?.flatrate : [];
-  const actionButton = !props.season.datetime_started_at ? 
+  const actionButton =!props.season.datetime_started_at ? 
     <button className="bg-accent! btn" onClick={() => (document.getElementById(`add_season_${props.season.watchlistId}`) as HTMLDialogElement)?.showModal()}>Start Watching</button>
     : !props.season.datetime_finished_at ? 
     <button className="bg-accent! btn" onClick={() => void props.finish(props.season.watchlistId)}>Finish Watching</button>

@@ -1,5 +1,5 @@
 import { ProfileInfo, StatsInfo, WatchListEntry } from "./types";
-import { MovieDb, SimpleSeason, TvSeasonResponse } from "moviedb-promise";
+import { MovieDb, SimpleSeason, TvSeasonResponse, WatchProvider, WatchProviderCountry } from "moviedb-promise";
 import { toast } from 'react-toastify';
 
 const moviedb = new MovieDb(process.env.TMDB_API_KEY || '');
@@ -7,6 +7,70 @@ const moviedb = new MovieDb(process.env.TMDB_API_KEY || '');
 export class ApiError extends Error {
   constructor(message: string, public body: unknown) {
     super(message);
+  }
+}
+
+export function getProvidersByPriority(
+  countryProviders: WatchProviderCountry | undefined,
+  preferredIds: number[],
+  ignoredIds: number[]
+): WatchProvider[] {
+  if (!countryProviders) return [];
+
+  const seen = new Set<number>();
+  const collect = (providers: WatchProvider[] | undefined): WatchProvider[] => {
+    if (!providers) return [];
+    return providers.filter(p => {
+      const id = p.provider_id;
+      if (id === undefined || ignoredIds.includes(id) || seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+  };
+
+  // No preferences set — show everything non-ignored (flatrate first, then free/ads, then rent/buy)
+  if (preferredIds.length === 0) {
+    return collect([
+      ...(countryProviders.flatrate ?? []),
+      ...(countryProviders.free ?? []),
+      ...(countryProviders.ads ?? []),
+      ...(countryProviders.rent ?? []),
+      ...(countryProviders.buy ?? []),
+    ]);
+  }
+
+  // Preferred providers first (flatrate/free/ads in user's list)
+  const allAvailable = [
+    ...(countryProviders.flatrate ?? []),
+    ...(countryProviders.free ?? []),
+    ...(countryProviders.ads ?? []),
+  ];
+  const preferred = collect(allAvailable.filter(p => p.provider_id !== undefined && preferredIds.includes(p.provider_id)));
+
+  // Then free/ads not already shown
+  const freeAds = collect([...(countryProviders.free ?? []), ...(countryProviders.ads ?? [])]);
+
+  // Then neutral flatrate not already shown
+  const neutralFlatrate = collect([...(countryProviders.flatrate ?? [])]);
+
+  if (preferred.length > 0 || freeAds.length > 0 || neutralFlatrate.length > 0) {
+    return [...preferred, ...freeAds, ...neutralFlatrate];
+  }
+
+  // Last resort: rent + buy
+  return collect([...(countryProviders.rent ?? []), ...(countryProviders.buy ?? [])]);
+}
+
+export async function fetchProvidersByCountry(country: string): Promise<WatchProvider[]> {
+  try {
+    const apiKey = process.env.TMDB_API_KEY || '';
+    const url = `https://api.themoviedb.org/3/watch/providers/tv?api_key=${apiKey}&watch_region=${country}`;
+    const response = await fetch(url);
+    const data = await response.json() as { results?: WatchProvider[] };
+    return data.results ?? [];
+  } catch (e) {
+    console.error(e);
+    return [];
   }
 }
 

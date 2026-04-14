@@ -46,7 +46,8 @@ export type ProfileInfo = {
   id: string;
   name: string;
   country: string;
-  providers: string[];
+  preferred_providers: number[];
+  ignored_providers: number[];
 }
 
 export type StatsInfo = {

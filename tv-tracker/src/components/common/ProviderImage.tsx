@@ -4,7 +4,7 @@ import { imageBaseUrl } from "../../constants";
 export default function ProviderImage(props: { count: number, providers: WatchProvider[] | undefined }) {
   const providerOptions =
       props.providers
-        ?.filter((p: WatchProvider) => (p.display_priority ?? 100) < 50 && p.logo_path)
+        ?.filter((p: WatchProvider) => p.logo_path)
         ?.slice(0, props.count) || [];
     const providersList = providerOptions.map((provider: WatchProvider) => {
       return (

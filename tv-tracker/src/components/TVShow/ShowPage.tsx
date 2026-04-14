@@ -5,24 +5,24 @@ import { useEffect, useState, useContext } from 'react';
 import { UserContext, User } from '../../contexts/UserContext';
 import { imageBaseUrl } from '../../constants';
 import Season from './Season';
-import { addSeasonToWatchList } from '../../utils';
-import { FullSeason, Rating, WatchProvider } from '../../types';
+import { addSeasonToWatchList, fetchSeasonData, fetchShowData, getProvidersByPriority } from '../../utils';
+import { FullSeason, Rating } from '../../types';
 import ProviderImage from '../common/ProviderImage';
-import { fetchSeasonData, fetchShowData } from '../../utils';
+import { ProfileContext } from '../../contexts/ProfileContext';
+import { WatchProviderCountry } from 'moviedb-promise';
 import '@/App.css';
 
 export default function ShowPage() {
   
   const user: User = useContext(UserContext);
+  const profile = useContext(ProfileContext);
 
   const params = useParams();
   const userLoggedIn: boolean = user?.isAuthenticated || false
   const [show, setShow] = useState<ShowResponse & {
-    'watch/providers'?: {
-      results: {US: {flatrate: WatchProvider[]}}
-    },
-    content_ratings?: {results: Rating[]} 
-  } >({});
+    'watch/providers'?: { results: Record<string, WatchProviderCountry> },
+    content_ratings?: {results: Rating[]}
+  }>({});
   const [seasonData, setSeasonData] = useState<TvSeasonResponse[]>([]);
   const [ watchDropdownOpen, setWatchDropdownOpen ] = useState(false);
 
@@ -53,7 +53,9 @@ export default function ShowPage() {
   const contentRating = show.content_ratings ? getContentRating(show.content_ratings) : 'NR';
   const genresString: string = show.genres ? show.genres.map((genre: Genre) => genre.name).join(', ') : '';
 
-  const providers = show?.['watch/providers']?.results?.US ? show['watch/providers'].results?.US?.flatrate : []
+  const country = profile?.country ?? 'US';
+  const providerCountry = show?.['watch/providers']?.results?.[country];
+  const providers = getProvidersByPriority(providerCountry, profile?.preferred_providers ?? [], profile?.ignored_providers ?? []);
 
   const seasonsList = show.seasons ? show.seasons.map((season: FullSeason, i: number) => {
     return <Season key={season.id} data={{ ...season, ...(seasonData?.[i] || {}) }} />;

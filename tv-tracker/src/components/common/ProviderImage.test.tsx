@@ -14,14 +14,14 @@ describe('ProviderImage', () => {
     expect(screen.getAllByRole('img')).toHaveLength(2);
   });
 
-  it('excludes providers with display_priority >= 50', () => {
+  it('renders providers regardless of display_priority (ordering is handled upstream)', () => {
     const providers = [
-      makeProvider({ provider_id: 1, display_priority: 10 }),
-      makeProvider({ provider_id: 2, display_priority: 50 }),
-      makeProvider({ provider_id: 3, display_priority: 99 }),
+      makeProvider({ provider_id: 1, display_priority: 10, logo_path: '/a.png' }),
+      makeProvider({ provider_id: 2, display_priority: 50, logo_path: '/b.png' }),
+      makeProvider({ provider_id: 3, display_priority: 99, logo_path: '/c.png' }),
     ];
     render(<ProviderImage count={10} providers={providers} />);
-    expect(screen.getAllByRole('img')).toHaveLength(1);
+    expect(screen.getAllByRole('img')).toHaveLength(3);
   });
 
   it('excludes providers without logo_path', () => {
