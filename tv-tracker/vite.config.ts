@@ -1,5 +1,5 @@
 import path from 'path';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import EnvironmentPlugin from 'vite-plugin-environment';
@@ -31,5 +31,10 @@ export default defineConfig({
   ],
   server: {
     port: 3090
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.ts'],
   }
 });

@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 
 const moviedb = new MovieDb(process.env.TMDB_API_KEY || '');
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(message: string, public body: unknown) {
     super(message);
   }
@@ -275,7 +275,28 @@ function getUserId(user: string) {
  * @param {Object} params Query params as an Object or an Array of key-value pairs
  * @returns a query string
  */
-function toQueryParams(params = {}) {
+export function getLastSunday(): string {
+  const date = new Date();
+  const dayOfWeek = date.getDay();
+  const lastSunday = new Date(date);
+  lastSunday.setDate(date.getDate() - dayOfWeek);
+  return lastSunday.toISOString().slice(0, 10);
+}
+
+export function getFirstOfTheMonth(): string {
+  const date = new Date();
+  date.setDate(1);
+  return date.toISOString().slice(0, 10);
+}
+
+export function getFirstOfTheYear(): string {
+  const date = new Date();
+  date.setMonth(0);
+  date.setDate(1);
+  return date.toISOString().slice(0, 10);
+}
+
+export function toQueryParams(params = {}) {
   if (!params || !Object.keys(params).length) {
     return '';
   }

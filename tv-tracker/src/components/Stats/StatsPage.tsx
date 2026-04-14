@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { UserContext, User } from '../../contexts/UserContext';
 import Loading from '../common/Loading';
-import { getSeasonsFinishedSince, getUserStats } from '../../utils';
+import { getSeasonsFinishedSince, getUserStats, getLastSunday, getFirstOfTheMonth, getFirstOfTheYear } from '../../utils';
 import { StatsInfo } from '../../types';
 
 export default function StatsPage() {
@@ -18,25 +18,6 @@ export default function StatsPage() {
       void getUserStats(user?.accessToken).then(data => setStats(data))
     }
   }, [user]);
-
-  function getLastSunday() {
-    const date = new Date();
-    const dayOfWeek = date.getDay();
-    const lastSunday = new Date(date);
-    lastSunday.setDate(date.getDate() - dayOfWeek);
-    return lastSunday.toISOString().slice(0, 10);
-  }
-  function getFirstOfTheMonth() {
-    const date = new Date();
-    date.setDate(1);
-    return date.toISOString().slice(0, 10);;
-  }
-  function getFirstOfTheYear() {
-    const date = new Date();
-    date.setMonth(0);
-    date.setDate(1);
-    return date.toISOString().slice(0, 10);;
-  }
 
   useEffect(() =>{
     if (!stats.length || !user) return;
