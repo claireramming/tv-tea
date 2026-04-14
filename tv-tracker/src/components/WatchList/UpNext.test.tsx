@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import UpNext from './UpNext';
-import { NextSeason } from '../../types';
 import { makeSeason } from '../../test/factories';
 
 vi.mock('../common/ProviderImage', () => ({
