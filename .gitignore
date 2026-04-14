@@ -48,8 +48,15 @@ build/
 tests/report/
 db.sqlite3
 staticfiles/
+.env
 debug.env
 .vscode/settings.json
 
 # Frontend build output
 tv-tracker/dist/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# npm
+package-lock.json

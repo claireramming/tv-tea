@@ -28,6 +28,7 @@ export type UpNextEpisode = {
   seasonName: string | undefined;
   episode: Episode;
   providers: WatchProvider[];
+  episodesReady: number;
 }
 
 export type NextSeason = SimpleSeason & {

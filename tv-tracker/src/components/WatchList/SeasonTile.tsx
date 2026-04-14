@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import { SeasonToWatch } from "../../types";
 import ProgressBar from "../common/ProgressBar";
 import ProviderImage from "../common/ProviderImage";
@@ -43,7 +44,7 @@ export default function SeasonTile(props: {
         </figure>
         <div className="card-body">
           <div className='flex justify-between'>
-            <h1 className="card-title text-4xl!">{props.season.show?.name}</h1>
+            <Link to={`/show/${props.season.show_id}`} className="card-title text-4xl! hover:text-primary transition-colors">{props.season.show?.name}</Link>
             <div>
               {startDate}
               {endDate}

@@ -107,6 +107,62 @@ describe('UpNext — readyToWatch section', () => {
   });
 });
 
+// ── Episodes ready badge ──────────────────────────────────────────────────────
+
+describe('UpNext — episodes ready badge', () => {
+  it('shows badge with count when more than one episode is ready', () => {
+    const season = makeSeason({
+      datetime_started_at: '2024-01-01T00:00:00Z',
+      num_episodes_watched: 0,
+      episodes: [
+        { id: 1, episode_number: 1, air_date: '2024-01-10', runtime: 45, name: 'Pilot' },
+        { id: 2, episode_number: 2, air_date: '2024-02-10', runtime: 45, name: 'Episode 2' },
+      ],
+    });
+    render(<UpNext {...defaultProps} watchlist={[season]} />);
+    expect(screen.getByText('2 Ready')).toBeInTheDocument();
+  });
+
+  it('does not show badge when only one episode is ready', () => {
+    const season = makeSeason({
+      datetime_started_at: '2024-01-01T00:00:00Z',
+      num_episodes_watched: 0,
+      episodes: [
+        { id: 1, episode_number: 1, air_date: '2024-01-10', runtime: 45, name: 'Pilot' },
+      ],
+    });
+    render(<UpNext {...defaultProps} watchlist={[season]} />);
+    expect(screen.queryByText('1 Ready')).not.toBeInTheDocument();
+  });
+
+  it('only counts episodes after the current watch position', () => {
+    const season = makeSeason({
+      datetime_started_at: '2024-01-01T00:00:00Z',
+      num_episodes_watched: 1,
+      episodes: [
+        { id: 1, episode_number: 1, air_date: '2024-01-10', runtime: 45, name: 'Pilot' },
+        { id: 2, episode_number: 2, air_date: '2024-02-10', runtime: 45, name: 'Episode 2' },
+        { id: 3, episode_number: 3, air_date: '2024-03-10', runtime: 45, name: 'Episode 3' },
+      ],
+    });
+    render(<UpNext {...defaultProps} watchlist={[season]} />);
+    expect(screen.getByText('2 Ready')).toBeInTheDocument();
+  });
+
+  it('does not count future episodes toward the ready badge', () => {
+    const season = makeSeason({
+      datetime_started_at: '2024-01-01T00:00:00Z',
+      num_episodes_watched: 0,
+      episodes: [
+        { id: 1, episode_number: 1, air_date: '2024-01-10', runtime: 45, name: 'Pilot' },
+        { id: 2, episode_number: 2, air_date: '2024-12-31', runtime: 45, name: 'Episode 2' },
+      ],
+    });
+    render(<UpNext {...defaultProps} watchlist={[season]} />);
+    expect(screen.queryByText('2 Ready')).not.toBeInTheDocument();
+  });
+});
+
 // ── Ignore workflow (nextSeasons) ─────────────────────────────────────────────
 
 describe('UpNext — ignore workflow', () => {

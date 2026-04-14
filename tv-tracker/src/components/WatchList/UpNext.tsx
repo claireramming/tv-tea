@@ -22,12 +22,16 @@ export default function UpNext(props: {
       const nextEpisode: Episode = season.episodes[season.num_episodes_watched];
       if (!nextEpisode?.air_date) return acc;
       if (nextEpisode.air_date < today) {
+        const episodesReady = season.episodes
+          .slice(season.num_episodes_watched)
+          .filter(ep => ep?.air_date && ep.air_date < today).length;
         acc.push({
           watchlistId: season.id,
           showName: season?.show?.name || '',
           seasonName: season.name,
           episode: nextEpisode,
           providers: season.providers?.US?.flatrate || [],
+          episodesReady,
         });
       }
     }
@@ -101,7 +105,10 @@ return (
           </figure>
           <div className="card-body">
             <div className='flex justify-between'>
-              <h2 className="card-title">{ep.showName}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="card-title">{ep.showName}</h2>
+                {ep.episodesReady > 1 && <div className="badge badge-primary">{ep.episodesReady} Ready</div>}
+              </div>
               <h3>{ep.seasonName}</h3>
             </div>
             <div className='flex gap-4'><div className="badge badge-secondary">Episode {ep.episode.episode_number}</div><div>{ep.episode?.runtime ? `${ep.episode.runtime} mins` : ''}</div></div>
