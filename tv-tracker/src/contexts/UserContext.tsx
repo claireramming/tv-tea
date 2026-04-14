@@ -8,4 +8,4 @@ export type User = {
   isAuthenticated?: boolean;
   accessToken?: string;
 };
-export const UserContext = createContext({});
+export const UserContext = createContext<User | null>(null);

@@ -13,8 +13,7 @@ export const mockUser: User = {
 
 export function renderWithUser(ui: ReactElement, user: User | null = mockUser) {
   return render(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <UserContext.Provider value={user as any}>
+    <UserContext.Provider value={user}>
       {ui}
     </UserContext.Provider>
   );
